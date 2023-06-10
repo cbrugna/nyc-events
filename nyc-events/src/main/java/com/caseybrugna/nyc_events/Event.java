@@ -1,14 +1,19 @@
 package com.caseybrugna.nyc_events;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Represents an event with its details.
  */
 public class Event {
     private String eventName;
-    private String date;
+    private LocalDate date;
     private String location;
     private String price;
     private String link;
@@ -30,7 +35,7 @@ public class Event {
     public Event(String eventName, String date, String location, String price, String link, String imageUrl,
             String artistsString) {
         this.eventName = eventName;
-        this.date = date;
+        this.date = parseDate(date);
         this.location = location;
         this.price = price;
         this.link = link;
@@ -53,8 +58,26 @@ public class Event {
      *
      * @return the event date
      */
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
+    }
+
+    /**
+     * Parses the provided date String into a LocalDate object.
+     * The input date String should be in the format "E, dd MMM", 
+     * where "E" represents the day of the week, "dd" represents the 
+     * day of the month, and "MMM" represents the month of the year.
+     * The returned LocalDate object will have the current year.
+     *
+     * @param date the date String to be parsed
+     * @return a LocalDate object representing the parsed date
+     */
+    private LocalDate parseDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM", Locale.ENGLISH);
+        TemporalAccessor temporalAccessor = formatter.parse(date);
+        return LocalDate.of(LocalDate.now().getYear(),
+                temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
+                temporalAccessor.get(ChronoField.DAY_OF_MONTH));
     }
 
     /**
@@ -141,9 +164,11 @@ public class Event {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM", Locale.ENGLISH);
+        
         sb.append("Event{");
         sb.append("eventName='").append(eventName).append('\'');
-        sb.append(", date='").append(date).append('\'');
+        sb.append(", date='").append(date.format(formatter)).append('\'');
         sb.append(", location='").append(location).append('\'');
         sb.append(", price='").append(price).append('\'');
         sb.append(", link='").append(link).append('\'');

@@ -109,13 +109,12 @@ public class DiceScraper {
      */
     public static void main(String[] args) {
         try {
-
-            /*
-             * List<Event> events = scrapeEvents();
-             * for (Event event : events) {
-             * System.out.println(event);
-             * }
-             */
+            List<Event> events = scrapeEvents();
+        
+            for (Event event : events) {
+                System.out.println(event);
+            }
+             
 
         } catch (RuntimeException e) {
             System.err.println("An error occurred while scraping the events: " + e.getMessage());
