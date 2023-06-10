@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A web scraper that extracts event data from a website and stores it in Event objects.
+ * A web scraper that extracts event data from a website and stores it in Event
+ * objects.
  */
 public class DiceScraper {
 
@@ -18,7 +19,8 @@ public class DiceScraper {
      * Scrapes event data from a website and returns a list of Event objects.
      *
      * @return a list of Event objects containing the scraped event data
-     * @throws RuntimeException if an error occurs while fetching the website data or extracting event details
+     * @throws RuntimeException if an error occurs while fetching the website data
+     *                          or extracting event details
      */
     public static List<Event> scrapeEvents() {
         String url = "https://dice.fm/browse/new-york/music/dj";
@@ -67,7 +69,7 @@ public class DiceScraper {
     /**
      * Extracts text from the specified CSS selector within the given element.
      *
-     * @param element    the element to extract text from
+     * @param element     the element to extract text from
      * @param cssSelector the CSS selector to locate the target element
      * @return the extracted text, or an empty string if the element is not found
      */
@@ -80,7 +82,8 @@ public class DiceScraper {
      * Extracts the lineup of artists from an event page given its URL.
      *
      * @param eventLink the URL of the event page
-     * @return a string representing the lineup of artists, or null if no lineup is found or an error occurs
+     * @return a string representing the lineup of artists, or null if no lineup is
+     *         found or an error occurs
      */
     private static String extractArtistsString(String eventLink) {
         try {
@@ -106,10 +109,14 @@ public class DiceScraper {
      */
     public static void main(String[] args) {
         try {
-            List<Event> events = scrapeEvents();
-            for (Event event : events) {
-                //System.out.println(event);
-            }
+
+            /*
+             * List<Event> events = scrapeEvents();
+             * for (Event event : events) {
+             * System.out.println(event);
+             * }
+             */
+
         } catch (RuntimeException e) {
             System.err.println("An error occurred while scraping the events: " + e.getMessage());
         }
