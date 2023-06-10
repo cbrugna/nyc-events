@@ -49,30 +49,12 @@ public class Event {
     }
 
     /**
-     * Sets the name of the event.
-     *
-     * @param eventName the event name to set
-     */
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    /**
      * Returns the date of the event.
      *
      * @return the event date
      */
     public String getDate() {
         return date;
-    }
-
-    /**
-     * Sets the date of the event.
-     *
-     * @param date the event date to set
-     */
-    public void setDate(String date) {
-        this.date = date;
     }
 
     /**
@@ -85,30 +67,12 @@ public class Event {
     }
 
     /**
-     * Sets the location of the event.
-     *
-     * @param location the event location to set
-     */
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    /**
      * Returns the price of the event.
      *
      * @return the event price
      */
     public String getPrice() {
         return price;
-    }
-
-    /**
-     * Sets the price of the event.
-     *
-     * @param price the event price to set
-     */
-    public void setPrice(String price) {
-        this.price = price;
     }
 
     /**
@@ -121,15 +85,6 @@ public class Event {
     }
 
     /**
-     * Sets the link to the event.
-     *
-     * @param link the event link to set
-     */
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    /**
      * Returns the imageUrl to the event.
      *
      * @return the imageUrl
@@ -139,30 +94,12 @@ public class Event {
     }
 
     /**
-     * Sets the imageUrl to the event.
-     *
-     * @param link the imageUrl to set
-     */
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    /**
      * Returns the artistsString of the event.
      *
      * @return artistsString the artist string from the link
      */
     public String getArtistsString() {
         return artistsString;
-    }
-
-    /**
-     * Sets the artistsString of the event.
-     *
-     * @param artistsString the artistsString to set
-     */
-    public void setAristsString(String artistsString) {
-        this.artistsString = artistsString;
     }
 
     /**
