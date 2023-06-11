@@ -1,8 +1,8 @@
 WORKING
-- Scraping Dice.fm, storing in objects, parsing lineup
+- Scraping Dice.fm, storing in objects, parsing lineup, Artist class
 
 
 TODO:
-- Clean up code
-- Rmeove prints from main and scrape method
+- Finish testing SpotifyAPIClient 
+- Figure out logging thing 
 
