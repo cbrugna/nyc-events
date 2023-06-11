@@ -39,8 +39,7 @@ public class DiceScraper {
                     System.err.println("An error occurred while extracting event details: " + e.getMessage());
                 }
             }
-
-            System.out.println("Scraping complete. Total events: " + events.size());
+            
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while fetching the website data: " + e.getMessage(), e);
         }

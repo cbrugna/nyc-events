@@ -33,7 +33,38 @@
       <artifactId>jsoup</artifactId>
       <version>1.14.2</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.thelinmichael</groupId>
+      <artifactId>spotify-web-api-java</artifactId>
+      <version>master-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          </exclusion>
+       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+
   </dependencies>
+
+  <repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
 
   <build>
     <finalName>nyc-events</finalName>
@@ -78,10 +109,18 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.1.0</version>
             <configuration>
-              <mainClass>com.caseybrugna.nyc_events.Main</mainClass>
+              <mainClass>com.caseybrugna.nyc_events.SpotifyAPIClient</mainClass>
             </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <includes>
+          <include>.env</include>
+        </includes>
+      </resource>
+    </resources>
   </build>
 </project>
