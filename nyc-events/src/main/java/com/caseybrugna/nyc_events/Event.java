@@ -19,7 +19,7 @@ public class Event {
     private String link;
     private String imageUrl;
     private String artistsString;
-    private List<String> lineup;
+    private List<Artist> lineup;
 
     /**
      * Constructs an Event object with the specified details.
@@ -132,25 +132,26 @@ public class Event {
     private void parseArtistsString() {
         lineup = new ArrayList<>();
 
-        if (artistsString != null && !artistsString.isEmpty()) {
-            String[] artists = artistsString.split(",");
-            for (int i = 0; i < artists.length; i++) {
-                String artist = artists[i].trim();
-                if (i == artists.length - 1) {
+        if (this.artistsString != null && !this.artistsString.isEmpty()) {
+            String[] names = this.artistsString.split(",");
+            for (int i = 0; i < names.length; i++) {
+                String name = names[i].trim();
+                if (i == names.length - 1) {
                     // Remove "and X more" from the last artist's name
-                    artist = artist.replaceAll(" and \\d+ more$", "");
+                    name = name.replaceAll(" and \\d+ more$", "");
                 }
+                Artist artist = new Artist(name);
                 lineup.add(artist);
             }
         }
     }
-
+    
     /**
-     * Returns the lineup list containing the parsed artists.
+     * Returns the lineup list of artist objects
      *
      * @return the lineup list of artists
      */
-    public List<String> getLineup() {
+    public List<Artist> getLineup() {
         return lineup;
     }
 

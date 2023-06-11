@@ -101,23 +101,4 @@ public class DiceScraper {
 
         return null;
     }
-
-    /**
-     * Main method to scrape events and print the details.
-     *
-     * @param args the command-line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            List<Event> events = scrapeEvents();
-        
-            for (Event event : events) {
-                System.out.println(event);
-            }
-             
-
-        } catch (RuntimeException e) {
-            System.err.println("An error occurred while scraping the events: " + e.getMessage());
-        }
-    }
 }
