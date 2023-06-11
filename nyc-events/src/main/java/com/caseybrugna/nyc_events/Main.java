@@ -10,11 +10,13 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         try {
-            List<Event> events = DiceScraper.scrapeEvents();
+            //List<Event> events = DiceScraper.scrapeEvents();
 
-            for (Event event : events) {
-                System.out.println(event);
-            }
+            //for (Event event : events) {
+            //    System.out.println(event);
+            //}
+
+            //System.out.println("This is from Main.java");
 
         } catch (RuntimeException e) {
             System.err.println("An error occurred while scraping the events: " + e.getMessage());
