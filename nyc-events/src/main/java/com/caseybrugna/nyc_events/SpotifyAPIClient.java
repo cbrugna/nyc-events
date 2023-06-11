@@ -13,7 +13,9 @@ public class SpotifyAPIClient {
     private static final String CLIENT_SECRET;
 
     static {
-        Dotenv dotenv = Dotenv.configure().load();
+        Dotenv dotenv = Dotenv.configure()
+                .directory("src/main/resources")
+                .load();
         CLIENT_ID = dotenv.get("CLIENT_ID");
         CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
     }
@@ -34,7 +36,7 @@ public class SpotifyAPIClient {
             spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 
             // Example API request: Get information about a track
-            String trackId = "11dFghVXANMlKmJXsNCbNl"; 
+            String trackId = "11dFghVXANMlKmJXsNCbNl";
             GetTrackRequest getTrackRequest = spotifyApi.getTrack(trackId).build();
             Track track = getTrackRequest.execute();
 

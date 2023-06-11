@@ -6,6 +6,9 @@ target/
 *.iml
 .vscode/
 
+# /Resources
+src/main/resources/.env
+
 # Ignore Maven-specific files
 pom.xml.tag
 pom.xml.releaseBackup
