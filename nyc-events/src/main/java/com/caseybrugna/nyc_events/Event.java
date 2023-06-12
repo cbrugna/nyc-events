@@ -19,7 +19,8 @@ public class Event {
     private String link;
     private String imageUrl;
     private String artistsString;
-    private List<Artist> lineup;
+    private List<String> lineup;
+    private List<Artist> artists;
 
     /**
      * Constructs an Event object with the specified details.
@@ -31,6 +32,8 @@ public class Event {
      * @param link          the link to the event
      * @param imageUrl      the link to the displayed image
      * @param artistsString the list of artists (uncleaned)
+     * @param lineup        the list of artists (cleaned)
+     * @param artists       the list of artist objects
      */
     public Event(String eventName, String date, String location, String price, String link, String imageUrl,
             String artistsString) {
@@ -42,6 +45,8 @@ public class Event {
         this.imageUrl = imageUrl;
         this.artistsString = artistsString;
         parseArtistsString();
+        artists = new ArrayList<>();
+        
     }
 
     /**
@@ -140,8 +145,7 @@ public class Event {
                     // Remove "and X more" from the last artist's name
                     name = name.replaceAll(" and \\d+ more$", "");
                 }
-                Artist artist = new Artist(name);
-                lineup.add(artist);
+                lineup.add(name);
             }
         }
     }
@@ -151,8 +155,12 @@ public class Event {
      *
      * @return the lineup list of artists
      */
-    public List<Artist> getLineup() {
+    public List<String> getLineup() {
         return lineup;
+    }
+
+    public void addArtist(Artist artist) {
+        artists.add(artist);
     }
 
     /**
