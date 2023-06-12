@@ -10,12 +10,19 @@ public class Main {
 
             for (Event event : events) {
                 if (event.getLineup() != null) {
-
-                    for (String artistString : event.getLineup()) {
-                        Artist artist = new Artist(artistString, spotify);
-                        event.addArtist(artist);
-                    }
                     
+                    for (String artistString : event.getLineup()) {
+                        try {
+                            Artist artist = new Artist(artistString, spotify);
+                            event.addArtist(artist);
+                            System.out.println(artist);
+                            System.out.println();
+                        } catch (RuntimeException e) {
+                            System.err.println("An error occurred while creating " + artistString + e.getMessage());
+                        }
+                        
+                    }
+
                 }
 
             }
