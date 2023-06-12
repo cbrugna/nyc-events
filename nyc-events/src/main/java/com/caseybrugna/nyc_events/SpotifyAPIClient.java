@@ -3,7 +3,6 @@ package com.caseybrugna.nyc_events;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
@@ -11,6 +10,7 @@ import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
 import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import com.wrapper.spotify.requests.data.search.SearchItemRequest;
+import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.model_objects.specification.Artist;
 import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.Track;
@@ -88,6 +88,23 @@ public class SpotifyAPIClient {
 
         } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
             System.err.println("An error occurred while fetching the artist's top tracks: " + e.getMessage());
+            return new String[0]; // Return an empty array in case of error
+        }
+    }
+
+    public String[] getArtistTopTrackTitles(String[] trackIDs) {
+        try {
+            GetSeveralTracksRequest request = spotifyApi.getSeveralTracks(trackIDs).build();
+            Track[] tracks = request.execute();
+
+            String[] trackTitles = new String[tracks.length];
+            for (int i = 0; i < tracks.length; i++) {
+                trackTitles[i] = tracks[i].getName();
+            }
+
+            return trackTitles;
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            System.err.println("An error occurred while fetching track titles: " + e.getMessage());
             return new String[0]; // Return an empty array in case of error
         }
     }
