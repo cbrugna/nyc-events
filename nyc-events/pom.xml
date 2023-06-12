@@ -103,7 +103,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.1.0</version>
             <configuration>
-              <mainClass>com.caseybrugna.nyc_events.SpotifyAPIClient</mainClass>
+              <mainClass>com.caseybrugna.nyc_events.Main</mainClass>
             </configuration>
         </plugin>
       </plugins>

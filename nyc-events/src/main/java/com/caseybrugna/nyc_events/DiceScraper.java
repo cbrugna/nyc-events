@@ -89,10 +89,7 @@ public class DiceScraper {
             Document eventDocument = Jsoup.connect(eventLink).get();
             Element artistElement = eventDocument.selectFirst("div.EventDetailsLineup__ArtistTitle-gmffoe-10.ciOfhd");
             if (artistElement != null) {
-                String artistsString = artistElement.text();
-                if (!artistsString.matches(".*and\\s+\\d+\\s+more$")) {
-                    return artistsString;
-                }
+                return artistElement.text();
             }
         } catch (IOException e) {
             System.err.println("An error occurred while extracting the lineup: " + e.getMessage());

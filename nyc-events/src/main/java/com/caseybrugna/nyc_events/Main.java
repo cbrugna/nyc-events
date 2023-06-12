@@ -2,21 +2,23 @@ package com.caseybrugna.nyc_events;
 
 import java.util.List;
 
-/**
-     * Main method to scrape events and print their details.
-     *
-     * @param args command-line arguments (not used)
-     */
 public class Main {
     public static void main(String[] args) {
         try {
-            //List<Event> events = DiceScraper.scrapeEvents();
+            List<Event> events = DiceScraper.scrapeEvents();
+            SpotifyAPIClient spotify = new SpotifyAPIClient();
 
-            //for (Event event : events) {
-            //    System.out.println(event);
-            //}
+            for (Event event : events) {
+                if (event.getLineup() != null) {
 
-            //System.out.println("This is from Main.java");
+                    for (String artistString : event.getLineup()) {
+                        Artist artist = new Artist(artistString, spotify);
+                        event.addArtist(artist);
+                    }
+                    
+                }
+
+            }
 
         } catch (RuntimeException e) {
             System.err.println("An error occurred while scraping the events: " + e.getMessage());
