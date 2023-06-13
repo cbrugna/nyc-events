@@ -3,6 +3,7 @@ package com.caseybrugna.nyc_events;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
@@ -14,6 +15,7 @@ import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.model_objects.specification.Artist;
 import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.Track;
+import com.wrapper.spotify.requests.data.artists.GetArtistRequest;
 import com.wrapper.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 
 import com.neovisionaries.i18n.CountryCode;
@@ -109,38 +111,67 @@ public class SpotifyAPIClient {
         }
     }
 
+    public String[] getArtistGenres(String artistID) {
+        try {
+            // Create a GetArtistRequest with the artist ID
+            GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
+
+            // Execute the request and retrieve the artist object
+            Artist artist = getArtistRequest.execute();
+
+            // Get the genres associated with the artist
+            String[] genres = artist.getGenres();
+
+            // Return the top three genres
+            if (genres.length > 3) {
+                return Arrays.copyOfRange(genres, 0, 3);
+            } else {
+                return genres;
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching the artist's genres: " + e.getMessage());
+            return new String[0]; // Return an empty array in case of error
+        }
+    }
+
+    public int getPopularityScore(String artistID) {
+        try {
+            // Create a GetArtistRequest with the artist ID
+        GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
+
+        // Execute the request and retrieve the artist object
+        Artist artist = getArtistRequest.execute();
+
+        int popularityScore = artist.getPopularity();
+        return popularityScore;
+
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching the popularuty score: " + e.getMessage());
+            return -1; // Return an empty array in case of error
+        }
+        
+
+        
+    }
+
+    public String getExternalUrl(String artistID) {
+        try {
+            // Create a GetArtistRequest with the artist ID
+            GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
+
+            // Execute the request and retrieve the artist object
+            Artist artist = getArtistRequest.execute();
+
+            String spotifyLink = artist.getExternalUrls().get("spotify");
+
+            return spotifyLink;
+
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching the artist's external URLs: " + e.getMessage());
+            return null; // Return an empty array in case of error
+        }
+        
+    }
+
 }
 
-/*
- * // ***** TEST CODE GOES HERE *** //
- * 
- * 
- * 
- * // Example API request: Search for an artist
- * String artistName = "John Summit";
- * SearchItemRequest searchItemRequest = spotifyApi.searchItem(artistName,
- * "artist").build();
- * 
- * // Execute the search request and get the paging object
- * Paging<Artist> artistPaging = searchItemRequest.execute().getArtists();
- * 
- * // Get the array of artists from the paging object
- * com.wrapper.spotify.model_objects.specification.Artist[] artists =
- * artistPaging.getItems();
- * System.out.println("artistPaging Length: " + artists.length);
- * 
- * if (artists.length > 0) {
- * Artist artist = artists[0];
- * 
- * // Print the artist's name and ID
- * System.out.println("Artist: " + artist.getName());
- * System.out.println("ID: " + artist.getId());
- * } else {
- * System.out.println("Artist not found");
- * }
- * 
- * 
- * 
- * 
- * // *** END TEST CODE *** //
- */
