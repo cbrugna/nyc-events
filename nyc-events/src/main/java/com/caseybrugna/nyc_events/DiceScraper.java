@@ -28,7 +28,7 @@ public class DiceScraper {
 
         try {
             Document document = Jsoup.connect(url).get();
-            Elements eventElements = document.select("div.EventCard__Event-sc-95ckmb-1.iTiBRM");
+            Elements eventElements = document.select("div.EventCard__Event-sc-95ckmb-1");
 
             for (Element eventElement : eventElements) {
                 try {
@@ -87,7 +87,7 @@ public class DiceScraper {
     private static String extractArtistsString(String eventLink) {
         try {
             Document eventDocument = Jsoup.connect(eventLink).get();
-            Element artistElement = eventDocument.selectFirst("div.EventDetailsLineup__ArtistTitle-gmffoe-10.ciOfhd");
+            Element artistElement = eventDocument.selectFirst("div.EventDetailsLineup__ArtistTitle-gmffoe-10");
             if (artistElement != null) {
                 return artistElement.text();
             }
