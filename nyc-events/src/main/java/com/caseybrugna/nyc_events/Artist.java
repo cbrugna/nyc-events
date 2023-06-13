@@ -1,5 +1,7 @@
 package com.caseybrugna.nyc_events;
 
+//import java.util.ArrayList;
+
 //import java.util.List;
 //import java.util.ArrayList;
 
@@ -10,6 +12,9 @@ public class Artist {
     private String[] topTrackIDs;
     private String[] topTrackTitles;
     private boolean hasSpotifyProfile;
+    private String[] artistGenres;
+    private int popularityScore;
+    private String externalUrl;
 
     public Artist(String name, SpotifyAPIClient spotifyApiClient) {
         this.name = name;
@@ -18,10 +23,15 @@ public class Artist {
             this.artistID = spotifyApiClient.getArtistID(name);
             this.topTrackIDs = spotifyApiClient.getArtistTopTracks(this.artistID);
             this.topTrackTitles = spotifyApiClient.getArtistTopTrackTitles(topTrackIDs);
+            this.artistGenres = spotifyApiClient.getArtistGenres(this.artistID);
+            this.popularityScore = spotifyApiClient.getPopularityScore(this.artistID);
+            this.externalUrl = spotifyApiClient.getExternalUrl(this.artistID);
+
             this.hasSpotifyProfile = true;
         } catch (Exception e) {
             this.artistID = null;
             this.hasSpotifyProfile = false;
+            this.externalUrl = createGoogleSearch(name);
         }
     }
 
@@ -41,11 +51,29 @@ public class Artist {
         return topTrackTitles;
     }
 
+    public String[] getArtistGenres() {
+        return artistGenres;
+    }
+
+    public int getPopularityScore() {
+        return popularityScore;
+    }
+
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    private String createGoogleSearch(String searchText) {
+        String baseUrl = "https://www.google.com/search?q=";
+        String encodedSearchText = java.net.URLEncoder.encode(searchText, java.nio.charset.StandardCharsets.UTF_8);
+        return baseUrl + encodedSearchText;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        if (hasSpotifyProfile == true) {
+        if (hasSpotifyProfile) {
             builder.append("Artist{name='").append(name).append("'");
             builder.append(", artistID='").append(artistID).append("'");
             builder.append(", topTrackIDs=[");
@@ -56,48 +84,23 @@ public class Artist {
                 // Remove the trailing comma and space
                 builder.delete(builder.length() - 2, builder.length());
             }
-            builder.append("]}");
+            builder.append("]");
+            builder.append(", artistGenres=[");
+            for (String genre : artistGenres) {
+                builder.append(genre).append(", ");
+            }
+            if (artistGenres.length > 0) {
+                // Remove the trailing comma and space
+                builder.delete(builder.length() - 2, builder.length());
+            }
+            builder.append("]");
+            builder.append(", popularityScore=").append(popularityScore);
+            builder.append(", externalUrl='").append(externalUrl).append("'");
+            builder.append("}");
         } else {
-            builder.append("Artist{name='").append(name).append("]}");
+            builder.append("Artist{name='").append(name).append("']");
         }
 
         return builder.toString();
     }
 }
-
-/**
- * public class Artist {
- * private String name;
- * private String artistID;
- * private List<String> topTrackIDs;
- * 
- * public Artist(String name, SpotifyAPIClient spotifyApiClient) {
- * this.name = name;
- * this.artistID = spotifyApiClient.getArtistID(name);
- * this.topTrackIDs = fetchTopTrackIDs();
- * }
- * 
- * private List<String> fetchTopTrackIDs() {
- * List<String> topTrackIDs = new ArrayList<>();
- * 
- * 
- * }
- * 
- * 
- * public String getName() {
- * return name;
- * }
- * 
- * public String getArtistID() {
- * return artistID;
- * }
- * 
- * @Override
- *           public String toString() {
- *           return "Artist{" +
- *           "name='" + name + '\'' +
- *           "artistID=" + artistID +
- *           '}';
- *           }
- *           }
- */
