@@ -46,7 +46,7 @@ public class Event {
         this.artistsString = artistsString;
         parseArtistsString();
         artists = new ArrayList<>();
-        
+
     }
 
     /**
@@ -69,8 +69,8 @@ public class Event {
 
     /**
      * Parses the provided date String into a LocalDate object.
-     * The input date String should be in the format "E, dd MMM", 
-     * where "E" represents the day of the week, "dd" represents the 
+     * The input date String should be in the format "E, dd MMM",
+     * where "E" represents the day of the week, "dd" represents the
      * day of the month, and "MMM" represents the month of the year.
      * The returned LocalDate object will have the current year.
      *
@@ -78,11 +78,15 @@ public class Event {
      * @return a LocalDate object representing the parsed date
      */
     private LocalDate parseDate(String date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
-        TemporalAccessor temporalAccessor = formatter.parse(date);
-        return LocalDate.of(LocalDate.now().getYear(),
-                temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
-                temporalAccessor.get(ChronoField.DAY_OF_MONTH));
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
+            TemporalAccessor temporalAccessor = formatter.parse(date);
+            return LocalDate.of(LocalDate.now().getYear(),
+                    temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
+                    temporalAccessor.get(ChronoField.DAY_OF_MONTH));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -149,7 +153,7 @@ public class Event {
             }
         }
     }
-    
+
     /**
      * Returns the lineup list of artist objects
      *
@@ -174,7 +178,7 @@ public class Event {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM dd", Locale.ENGLISH);
-        
+
         sb.append("Event{");
         sb.append("eventName='").append(eventName).append('\'');
         sb.append(", date='").append(date.format(formatter)).append('\'');
