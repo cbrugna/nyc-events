@@ -3,11 +3,18 @@ package com.caseybrugna.nyc_events;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Duration;
 
 /**
  * A web scraper that extracts event data from a website and stores it in Event
@@ -26,23 +33,51 @@ public class DiceScraper {
         String url = "https://dice.fm/browse/new-york/music/dj";
         List<Event> events = new ArrayList<>();
 
-        try {
-            Document document = Jsoup.connect(url).get();
-            Elements eventElements = document.select("div.EventCard__Event-sc-95ckmb-1");
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
+        WebDriver driver = new ChromeDriver();
+        driver.get(url);
 
-            for (Element eventElement : eventElements) {
+        try {
+            while (true) {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // waits up to 10 seconds
+
+                WebElement loadMoreDiv = driver
+                        .findElement(By.cssSelector("div.styles__LoadMoreRow-sc-1505uh6-1.cxEHUh"));
+
+                // Now find the button within that div
+                WebElement loadMoreButton = loadMoreDiv
+                        .findElement(By.cssSelector("button.ButtonBase-sc-1lkfwal-0.Button-b7vefn-0.gIWihf.cIyxHS"));
+
+                        
+                wait.until(ExpectedConditions.elementToBeClickable(loadMoreButton));
+
+                loadMoreButton.click();
+
                 try {
-                    Event event = extractEvent(eventElement);
-                    events.add(event);
-                } catch (Exception e) {
-                    // Log the error and continue with the next event
-                    System.err.println("An error occurred while extracting event details: " + e.getMessage());
+                    Thread.sleep(3000); // adjust this delay as necessary
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-            
-        } catch (IOException e) {
-            throw new RuntimeException("An error occurred while fetching the website data: " + e.getMessage(), e);
+
+        } catch (NoSuchElementException e) {
+            // The "Load more" button is no longer found in the page, so we have loaded all
+            // the content.
         }
+
+        List<WebElement> eventElements = driver.findElements(By.cssSelector("div.EventCard__Event-sc-95ckmb-1"));
+
+        for (WebElement eventElement : eventElements) {
+            try {
+                Event event = extractEvent(eventElement);
+                events.add(event);
+            } catch (Exception e) {
+                // Log the error and continue with the next event
+                System.err.println("An error occurred while extracting event details: " + e.getMessage());
+            }
+        }
+
+        driver.quit();
 
         return events;
     }
@@ -53,13 +88,13 @@ public class DiceScraper {
      * @param eventElement the event element to extract details from
      * @return an Event object containing the extracted event details
      */
-    private static Event extractEvent(Element eventElement) {
+    private static Event extractEvent(WebElement eventElement) {
         String eventName = extractText(eventElement, "div.styles__Title-mwubo3-6");
         String date = extractText(eventElement, "div.styles__Date-mwubo3-8");
         String location = extractText(eventElement, "div.styles__Venue-mwubo3-7");
         String price = extractText(eventElement, "div.styles__Price-mwubo3-9");
-        String link = "https://dice.fm/" + eventElement.select("a.styles__EventCardLink-mwubo3-5").attr("href");
-        String imageUrl = eventElement.select("img.styles__Image-mwubo3-3").attr("src");
+        String link = eventElement.findElement(By.cssSelector("a.styles__EventCardLink-mwubo3-5")).getAttribute("href");
+        String imageUrl = eventElement.findElement(By.cssSelector("img.styles__Image-mwubo3-3")).getAttribute("src");
         String artistsString = extractArtistsString(link);
 
         return new Event(eventName, date, location, price, link, imageUrl, artistsString);
@@ -72,9 +107,9 @@ public class DiceScraper {
      * @param cssSelector the CSS selector to locate the target element
      * @return the extracted text, or an empty string if the element is not found
      */
-    private static String extractText(Element element, String cssSelector) {
-        Element targetElement = element.selectFirst(cssSelector);
-        return targetElement != null ? targetElement.text() : "";
+    private static String extractText(WebElement element, String cssSelector) {
+        WebElement targetElement = element.findElement(By.cssSelector(cssSelector));
+        return targetElement != null ? targetElement.getText() : "";
     }
 
     /**
