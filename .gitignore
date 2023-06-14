@@ -7,7 +7,7 @@ target/
 .vscode/
 
 # /Resources
-/nyc-events/src/main/resources
+nyc-events/src/main/resources
 
 # Ignore Maven-specific files
 pom.xml.tag
