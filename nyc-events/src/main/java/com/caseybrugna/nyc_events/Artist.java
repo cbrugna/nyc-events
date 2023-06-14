@@ -1,10 +1,8 @@
 package com.caseybrugna.nyc_events;
 
-//import java.util.ArrayList;
-
-//import java.util.List;
-//import java.util.ArrayList;
-
+/**
+ * A class representing an Artist with their details fetched from the Spotify API.
+ */
 public class Artist {
     private String name;
     // private SpotifyAPIClient spotifyApiClient;
@@ -16,6 +14,13 @@ public class Artist {
     private int popularityScore;
     private String externalUrl;
 
+    /**
+     * Constructor for the Artist class.
+     * Initializes an Artist object with the given name and fetches their details from the Spotify API.
+     *
+     * @param name The name of the artist.
+     * @param spotifyApiClient The SpotifyAPIClient object to use for fetching artist details.
+     */
     public Artist(String name, SpotifyAPIClient spotifyApiClient) {
         this.name = name;
         // this.spotifyApiClient = spotifyApiClient;
@@ -35,40 +40,86 @@ public class Artist {
         }
     }
 
+    /**
+     * Returns the name of the artist.
+     *
+     * @return The name of the artist.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the Spotify ID of the artist.
+     *
+     * @return The Spotify ID of the artist.
+     */
     public String getArtistID() {
         return artistID;
     }
 
+    /**
+     * Returns the IDs of the artist's top tracks on Spotify.
+     *
+     * @return An array of the artist's top track IDs.
+     */
     public String[] getTopTrackIDs() {
         return topTrackIDs;
     }
 
+    /**
+     * Returns the titles of the artist's top tracks on Spotify.
+     *
+     * @return An array of the artist's top track titles.
+     */
     public String[] getTopTrackTitles() {
         return topTrackTitles;
     }
 
+    /**
+     * Returns the genres associated with the artist on Spotify.
+     *
+     * @return An array of the artist's genres.
+     */
     public String[] getArtistGenres() {
         return artistGenres;
     }
 
+    /**
+     * Returns the popularity score of the artist on Spotify.
+     *
+     * @return The artist's popularity score.
+     */
     public int getPopularityScore() {
         return popularityScore;
     }
 
+    /**
+     * Returns the external URL of the artist's Spotify profile.
+     *
+     * @return The artist's Spotify profile URL.
+     */
     public String getExternalUrl() {
         return externalUrl;
     }
 
+    /**
+     * Creates a Google search URL with the provided search text.
+     *
+     * @param searchText The text to use for the Google search.
+     * @return The created Google search URL.
+     */
     private String createGoogleSearch(String searchText) {
         String baseUrl = "https://www.google.com/search?q=";
         String encodedSearchText = java.net.URLEncoder.encode(searchText, java.nio.charset.StandardCharsets.UTF_8);
         return baseUrl + encodedSearchText;
     }
 
+    /**
+     * Returns a stringrepresentation of the Artist object, including all of its details.
+
+     * @return A string representation of the Artist object.
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -98,7 +149,7 @@ public class Artist {
             builder.append(", externalUrl='").append(externalUrl).append("'");
             builder.append("}");
         } else {
-            builder.append("Artist{name='").append(name).append("']");
+            builder.append("Artist{name='").append(name).append("'}");
         }
 
         return builder.toString();
