@@ -5,6 +5,10 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         try {
+
+
+
+            
             List<Event> events = DiceScraper.scrapeEvents();
 
             

@@ -37,6 +37,18 @@ public class DiceScraper {
         WebDriver driver = new ChromeDriver();
         driver.get(url);
 
+        // Dismiss the cookies consent popup
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // waits up to 10 seconds
+            WebElement allowCookiesButton = wait.until(ExpectedConditions
+                    .elementToBeClickable(By.cssSelector(".ch2-btn.ch2-allow-all-btn.ch2-btn-primary")));
+            allowCookiesButton.click();
+        } catch (Exception e) {
+            System.err
+                    .println("An error occurred while trying to dismiss the cookies consent popup: " + e.getMessage());
+        }
+
+        // Load more try
         try {
             while (true) {
                 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // waits up to 10 seconds
@@ -48,7 +60,6 @@ public class DiceScraper {
                 WebElement loadMoreButton = loadMoreDiv
                         .findElement(By.cssSelector("button.ButtonBase-sc-1lkfwal-0.Button-b7vefn-0.gIWihf.cIyxHS"));
 
-                        
                 wait.until(ExpectedConditions.elementToBeClickable(loadMoreButton));
 
                 loadMoreButton.click();
@@ -66,6 +77,7 @@ public class DiceScraper {
         }
 
         List<WebElement> eventElements = driver.findElements(By.cssSelector("div.EventCard__Event-sc-95ckmb-1"));
+        // driver.quit();
 
         for (WebElement eventElement : eventElements) {
             try {
