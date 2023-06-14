@@ -9,7 +9,6 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
 import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
-
 import com.wrapper.spotify.requests.data.search.SearchItemRequest;
 import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.model_objects.specification.Artist;
@@ -20,6 +19,9 @@ import com.wrapper.spotify.requests.data.artists.GetArtistsTopTracksRequest;
 
 import com.neovisionaries.i18n.CountryCode;
 
+/**
+ * A class to interact with the Spotify API and retrieve artist and track data.
+ */
 public class SpotifyAPIClient {
     private static final String CLIENT_ID;
     private static final String CLIENT_SECRET;
@@ -33,6 +35,13 @@ public class SpotifyAPIClient {
         CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
     }
 
+    /**
+     * Constructor for the SpotifyAPIClient class.
+     * Initializes the SpotifyApi instance with client ID and client secret from the .env file.
+     * Retrieves a client token for authorization and sets it on the SpotifyApi object.
+     *
+     * @throws RuntimeException If there's an error while retrieving client credentials.
+     */
     public SpotifyAPIClient() {
         spotifyApi = new SpotifyApi.Builder()
                 .setClientId(CLIENT_ID)
@@ -52,6 +61,13 @@ public class SpotifyAPIClient {
         }
     }
 
+    /**
+     * Searches for an artist in the Spotify API using the provided artist name.
+     * Returns the ID of the first artist found with a matching name.
+     *
+     * @param artistName The name of the artist to search for.
+     * @return The ID of the artist, or null if no artist was found.
+     */
     public String getArtistID(String artistName) {
         try {
             // Create a SearchItemRequest to search for the artist
@@ -76,6 +92,12 @@ public class SpotifyAPIClient {
         return null;
     }
 
+    /**
+     * Retrieves the top tracks for a given artist from the Spotify API.
+     *
+     * @param artistID The ID of the artistto retrieve top tracks for.
+     * @return An array of track IDs for the artist's top tracks.
+     */
     public String[] getArtistTopTracks(String artistID) {
         try {
             GetArtistsTopTracksRequest request = spotifyApi.getArtistsTopTracks(artistID, CountryCode.US).build();
@@ -94,6 +116,12 @@ public class SpotifyAPIClient {
         }
     }
 
+    /**
+     * Retrieves the titles of a given set of tracks from the Spotify API.
+     *
+     * @param trackIDs An array of track IDs to retrieve titles for.
+     * @return An array of track titles corresponding to the provided track IDs.
+     */
     public String[] getArtistTopTrackTitles(String[] trackIDs) {
         try {
             GetSeveralTracksRequest request = spotifyApi.getSeveralTracks(trackIDs).build();
@@ -111,6 +139,12 @@ public class SpotifyAPIClient {
         }
     }
 
+    /**
+     * Retrieves the top three genres associated with a given artist from the Spotify API.
+     *
+     * @param artistID The ID of the artist to retrieve genres for.
+     * @return An array of the top three genres associated with the artist.
+     */
     public String[] getArtistGenres(String artistID) {
         try {
             // Create a GetArtistRequest with the artist ID
@@ -134,6 +168,12 @@ public class SpotifyAPIClient {
         }
     }
 
+    /**
+     * Retrieves the popularity score of a given artist from the Spotify API.
+     *
+     * @param artistID The ID of the artist to retrieve the popularity score for.
+     * @return The artist's popularity score, or -1 if an error occurred.
+     */
     public int getPopularityScore(String artistID) {
         try {
             // Create a GetArtistRequest with the artist ID
@@ -146,14 +186,17 @@ public class SpotifyAPIClient {
         return popularityScore;
 
         } catch (Exception e) {
-            System.err.println("An error occurred while fetching the popularuty score: " + e.getMessage());
-            return -1; // Return an empty array in case of error
+            System.err.println("An error occurred while fetching the popularity score: " + e.getMessage());
+            return -1; // Return -1 in case of error
         }
-        
-
-        
     }
 
+    /**
+     * Retrieves the Spotify link for a given artist from the Spotify API.
+     *
+     * @param artistID The ID of the artist to retrieve the Spotify link for.
+     * @return The artist's Spotify link, or null if an error occurred.
+     */
     public String getExternalUrl(String artistID) {
         try {
             // Create a GetArtistRequest with the artist ID
@@ -168,10 +211,8 @@ public class SpotifyAPIClient {
 
         } catch (Exception e) {
             System.err.println("An error occurred while fetching the artist's external URLs: " + e.getMessage());
-            return null; // Return an empty array in case of error
+            return null; // Return null in case of error
         }
-        
     }
 
 }
-
