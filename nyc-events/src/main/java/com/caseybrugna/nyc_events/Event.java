@@ -78,7 +78,7 @@ public class Event {
      * @return a LocalDate object representing the parsed date
      */
     private LocalDate parseDate(String date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
         TemporalAccessor temporalAccessor = formatter.parse(date);
         return LocalDate.of(LocalDate.now().getYear(),
                 temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
@@ -173,7 +173,7 @@ public class Event {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM dd", Locale.ENGLISH);
         
         sb.append("Event{");
         sb.append("eventName='").append(eventName).append('\'');
