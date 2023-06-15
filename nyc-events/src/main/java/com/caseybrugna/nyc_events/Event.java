@@ -7,13 +7,15 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.sql.Date;
 
 /**
  * Represents an event with its details.
  */
 public class Event {
+    private String eventID;
     private String eventName;
-    private LocalDate date;
+    private java.sql.Date date;
     private String location;
     private String price;
     private String link;
@@ -25,6 +27,7 @@ public class Event {
     /**
      * Constructs an Event object with the specified details.
      *
+     * @param eventID       the ID of the event (generated)
      * @param eventName     the name of the event
      * @param date          the date of the event
      * @param location      the location of the event
@@ -47,6 +50,30 @@ public class Event {
         parseArtistsString();
         artists = new ArrayList<>();
 
+        this.eventID = generateEventID();
+
+    }
+
+    public String generateEventID() {
+    // Concatenate relevant event details
+    String eventDetails = eventName + date.toString() + location;
+
+    // Generate a unique ID using the hashCode of the event details
+    int hashCode = eventDetails.hashCode();
+    String uniqueID = Integer.toHexString(hashCode);
+
+    uniqueID = uniqueID.replaceAll("[^a-zA-Z0-9]", "");
+
+    return uniqueID;
+    }
+
+    /**
+     * Returns the ID of the event.
+     *
+     * @return the event name
+     */
+    public String getEventID() {
+        return eventID;
     }
 
     /**
@@ -63,7 +90,7 @@ public class Event {
      *
      * @return the event date
      */
-    public LocalDate getDate() {
+    public java.sql.Date getDate() {
         return date;
     }
 
@@ -77,13 +104,14 @@ public class Event {
      * @param date the date String to be parsed
      * @return a LocalDate object representing the parsed date
      */
-    private LocalDate parseDate(String date) {
+    private java.sql.Date parseDate(String date) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
             TemporalAccessor temporalAccessor = formatter.parse(date);
-            return LocalDate.of(LocalDate.now().getYear(),
+            LocalDate localDate = LocalDate.of(LocalDate.now().getYear(),
                     temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
                     temporalAccessor.get(ChronoField.DAY_OF_MONTH));
+            return java.sql.Date.valueOf(localDate);
         } catch (Exception e) {
             return null;
         }
@@ -176,24 +204,13 @@ public class Event {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM dd", Locale.ENGLISH);
-
-        sb.append("Event{");
-        sb.append("eventName='").append(eventName).append('\'');
-        sb.append(", date='").append(date.format(formatter)).append('\'');
-        sb.append(", location='").append(location).append('\'');
-        sb.append(", price='").append(price).append('\'');
-        sb.append(", link='").append(link).append('\'');
-        sb.append(", imageUrl='").append(imageUrl).append('\'');
-
-        if (lineup.isEmpty()) {
-            sb.append(", lineup=").append("n/a");
-        } else {
-            sb.append(", lineup=").append(lineup);
-        }
-
-        sb.append('}');
-        return sb.toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]");
+        String formattedDate = date != null ? formatter.format(date.toLocalDate()) : "N/A";
+        return "Event: " + eventName + "\n"
+                + "Date: " + formattedDate + "\n"
+                + "Location: " + location + "\n"
+                + "Price: " + price + "\n"
+                + "Link: " + link + "\n"
+                + "Image URL: " + imageUrl + "\n";
     }
 }

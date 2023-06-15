@@ -17,25 +17,31 @@ import java.util.List;
 import java.time.Duration;
 
 /**
- * A class that provides methods to scrape event data from a website and store it in Event objects.
+ * A class that provides methods to scrape event data from a website and store
+ * it in Event objects.
  */
 public class DiceScraper {
-    
+
     /**
-     * This method scrapes event data from the "https://dice.fm/browse/new-york/music/dj" website.
-     * It loads all available events by clicking on the "Load more" button until it's no longer available.
-     * Then, it extracts the details of each event and creates an Event object for each one.
+     * This method scrapes event data from the
+     * "https://dice.fm/browse/new-york/music/dj" website.
+     * It loads all available events by clicking on the "Load more" button until
+     * it's no longer available.
+     * Then, it extracts the details of each event and creates an Event object for
+     * each one.
      * All Event objects are then added to a list which is returned by the method.
      *
-     * @return A list of Event objects, each representing an event extracted from the website.
-     * @throws RuntimeException If there's an error during website data retrieval or event detail extraction.
+     * @return A list of Event objects, each representing an event extracted from
+     *         the website.
+     * @throws RuntimeException If there's an error during website data retrieval or
+     *                          event detail extraction.
      */
     public static List<Event> scrapeEvents() {
         String url = "https://dice.fm/browse/new-york/music/dj";
         WebDriver driver = setupWebDriver();
         driver.get(url);
         dismissCookieConsentPopup(driver);
-        loadAllEvents(driver);
+        // loadAllEvents(driver);
         List<Event> events = extractEventDetails(driver);
         driver.quit();
         return events;
@@ -64,12 +70,14 @@ public class DiceScraper {
                     .elementToBeClickable(By.cssSelector(".ch2-btn.ch2-allow-all-btn.ch2-btn-primary")));
             allowCookiesButton.click();
         } catch (Exception e) {
-            System.err.println("An error occurred while trying to dismiss the cookies consent popup: " + e.getMessage());
+            System.err
+                    .println("An error occurred while trying to dismiss the cookies consent popup: " + e.getMessage());
         }
     }
 
     /**
-     * This method loads all available events by clicking on the "Load more" button until it's no longer available.
+     * This method loads all available events by clicking on the "Load more" button
+     * until it's no longer available.
      *
      * @param driver The WebDriver instance used for web scraping operations.
      */
@@ -77,8 +85,10 @@ public class DiceScraper {
         try {
             while (true) {
                 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement loadMoreDiv = driver.findElement(By.cssSelector("div.styles__LoadMoreRow-sc-1505uh6-1.cxEHUh"));
-                WebElement loadMoreButton = loadMoreDiv.findElement(By.cssSelector("button.ButtonBase-sc-1lkfwal-0.Button-b7vefn-0.gIWihf.cIyxHS"));
+                WebElement loadMoreDiv = driver
+                        .findElement(By.cssSelector("div.styles__LoadMoreRow-sc-1505uh6-1.cxEHUh"));
+                WebElement loadMoreButton = loadMoreDiv
+                        .findElement(By.cssSelector("button.ButtonBase-sc-1lkfwal-0.Button-b7vefn-0.gIWihf.cIyxHS"));
                 wait.until(ExpectedConditions.elementToBeClickable(loadMoreButton));
                 loadMoreButton.click();
                 try {
@@ -93,10 +103,12 @@ public class DiceScraper {
     }
 
     /**
-     * This method extracts the details of each event from the loaded website data and creates a list of Event objects.
+     * This method extracts the details of each event from the loaded website data
+     * and creates a list of Event objects.
      *
      * @param driver The WebDriver instance used for web scraping operations.
-     * @return A list of Event objects, each representing an event extracted from the website.
+     * @return A list of Event objects, each representing an event extracted from
+     *         the website.
      */
     private static List<Event> extractEventDetails(WebDriver driver) {
         List<Event> events = new ArrayList<>();
@@ -114,31 +126,54 @@ public class DiceScraper {
 
     /**
      * This method extracts the details of an event from a given WebElement.
-     * It finds specific details such as event name, date, location, price, link, image URL, and artists.
+     * It finds specific details such as event name, date, location, price, link,
+     * image URL, and artists.
      * Then, it creates and returns an Event object with these details.
      *
      * @param eventElement The WebElement from which to extract event details.
-     * @return An Event object with the details extracted from the provided WebElement.
+     * @return An Event object with the details extracted from the provided
+     *         WebElement.
      */
     private static Event extractEvent(WebElement eventElement) {
-        String eventName = extractText(eventElement, "div.styles__Title-mwubo3-6");
-        String date = extractText(eventElement, "div.styles__Date-mwubo3-8");
-        String location = extractText(eventElement, "div.styles__Venue-mwubo3-7");
-        String price = extractText(eventElement, "div.styles__Price-mwubo3-9");
-        String link = eventElement.findElement(By.cssSelector("a.styles__EventCardLink-mwubo3-5")).getAttribute("href");
-        String imageUrl = eventElement.findElement(By.cssSelector("img.styles__Image-mwubo3-3")).getAttribute("src");
-        String artistsString = extractArtistsString(link);
+        try {
+            String eventName = extractText(eventElement, "div.styles__Title-mwubo3-6");
+            //System.out.println("eventName: " + eventName);
 
-        return new Event(eventName, date, location, price, link, imageUrl, artistsString);
+            String date = extractText(eventElement, "div.styles__Date-mwubo3-8");
+            //System.out.println("date: " + date);
+
+            String location = extractText(eventElement, "div.styles__Venue-mwubo3-7");
+            //System.out.println("location: " + location);
+
+            String price = extractText(eventElement, "div.styles__Price-mwubo3-9");
+            //System.out.println("price: " + price);
+
+            String link = eventElement.findElement(By.cssSelector("a.styles__EventCardLink-mwubo3-5")).getAttribute("href");
+            //System.out.println("link: " + link);
+
+            String imageUrl = eventElement.findElement(By.cssSelector("img.styles__Image-mwubo3-3")).getAttribute("src");
+            //System.out.println("imageUrl: " + imageUrl);
+
+            String artistsString = extractArtistsString(link);
+            //System.out.println("artistsString: " + artistsString);
+
+            return new Event(eventName, date, location, price, link, imageUrl, artistsString);
+        } catch (Exception e) {
+            System.err.println("An error occurred while extracting event details:");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
      * This method extracts text from a WebElement using a given CSS selector.
      * If the target element doesn't exist, it returns an empty string.
      *
-     * @param element The WebElement from which to extract text.
-     * @param cssSelector The CSS selector to locate the target element within the provided WebElement.
-     * @return The extracted text as a String, or an empty string if the target element is not found.
+     * @param element     The WebElement from which to extract text.
+     * @param cssSelector The CSS selector to locate the target element within the
+     *                    provided WebElement.
+     * @return The extracted text as a String, or an empty string if the target
+     *         element is not found.
      */
     private static String extractText(WebElement element, String cssSelector) {
         WebElement targetElement = element.findElement(By.cssSelector(cssSelector));
@@ -146,11 +181,15 @@ public class DiceScraper {
     }
 
     /**
-     * This method extracts the lineup of artists from an event page by connecting to the event's URL.
-     * If an artist lineup isn't found or an error occurs during extraction, it returns null.
+     * This method extracts the lineup of artists from an event page by connecting
+     * to the event's URL.
+     * If an artist lineup isn't found or an error occurs during extraction, it
+     * returns null.
      *
-     * @param eventLink The URL of the event page from which to extract the artist lineup.
-     * @return A String representing the artist lineup, or null if no lineup is found or an error occurs during extraction.
+     * @param eventLink The URL of the event page from which to extract the artist
+     *                  lineup.
+     * @return A String representing the artist lineup, or null if no lineup is
+     *         found or an error occurs during extraction.
      */
     private static String extractArtistsString(String eventLink) {
         try {
