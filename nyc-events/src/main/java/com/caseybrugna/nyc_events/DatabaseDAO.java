@@ -9,6 +9,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wrapper.spotify.model_objects.specification.ExternalUrl;
+
+import javassist.bytecode.stackmap.BasicBlock.Catch;
+
 public class DatabaseDAO {
     private Connection connection;
     private String url;
@@ -21,13 +25,32 @@ public class DatabaseDAO {
         this.password = password;
     }
 
+    public void insertArtists(List<Artist> artists) {
+        String query = "INSERT INTO Events (ArtistID, Name, HasSpotifyProfile, PopularityScore, ExternalUrl) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (Artist artist : artists) {
+                statement.setString(0, artist.getArtistID());
+                statement.setString(0, artist.getName());
+                statement.setBoolean(0, artist.getHasArtistProfile());
+                statement.setInt(0, artist.getPopularityScore());
+                statement.setString(0, artist.getExternalUrl());
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public void insertEvents(List<Event> events) {
         String query = "INSERT INTO Events (EventID, EventName, Date, Location, Price, Link, ImageUrl) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (Event event : events) {
-
 
                 statement.setString(1, event.getEventID());
                 statement.setString(2, event.getEventName());
@@ -36,6 +59,7 @@ public class DatabaseDAO {
                 statement.setString(5, event.getPrice());
                 statement.setString(6, event.getLink());
                 statement.setString(7, event.getImageUrl());
+
                 statement.addBatch();
             }
 

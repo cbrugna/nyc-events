@@ -104,6 +104,17 @@ public class Artist {
     }
 
     /**
+     * Returns the hasSpotifyProfile boolean
+     *
+     * @return The artist's hasSpotifyProfile
+     */
+    public Boolean getHasArtistProfile() {
+        return hasSpotifyProfile;
+    }
+
+
+
+    /**
      * Creates a Google search URL with the provided search text.
      *
      * @param searchText The text to use for the Google search.

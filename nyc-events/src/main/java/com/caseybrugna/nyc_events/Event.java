@@ -191,6 +191,10 @@ public class Event {
         return lineup;
     }
 
+    public String getLineupAsString() {
+        return String.join(",", lineup);
+    }
+
     public void addArtist(Artist artist) {
         artists.add(artist);
     }

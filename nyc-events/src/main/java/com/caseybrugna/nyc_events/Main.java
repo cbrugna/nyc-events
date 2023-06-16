@@ -1,11 +1,11 @@
 package com.caseybrugna.nyc_events;
 
 import java.util.List;
+import java.util.ArrayList;
 
-import org.openqa.selenium.devtools.v112.database.Database;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import io.github.cdimascio.dotenv.DotenvBuilder;
+
 
 /**
  * The main class that coordinates the scraping of events and artist data.
@@ -28,6 +28,7 @@ public class Main {
      */
     public static void main(String[] args) {
         List<Event> events = DiceScraper.scrapeEvents();
+        List<Artist> artists = new ArrayList<>();
         try {
 
             SpotifyAPIClient spotify = new SpotifyAPIClient();
@@ -62,6 +63,7 @@ public class Main {
         databaseDAO.connect();
 
         // Perform database operations using the databaseDAO object
+        databaseDAO.insertArtists(artists);
         databaseDAO.insertEvents(events);
 
         databaseDAO.disconnect();
