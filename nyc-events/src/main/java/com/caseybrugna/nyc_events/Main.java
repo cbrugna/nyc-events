@@ -3,9 +3,7 @@ package com.caseybrugna.nyc_events;
 import java.util.List;
 import java.util.ArrayList;
 
-
 import io.github.cdimascio.dotenv.Dotenv;
-
 
 /**
  * The main class that coordinates the scraping of events and artist data.
@@ -38,6 +36,7 @@ public class Main {
                     for (String artistString : event.getLineup()) {
                         try {
                             Artist artist = new Artist(artistString, spotify);
+                            artists.add(artist);
                             event.addArtist(artist);
                             System.out.println(artist);
                             System.out.println();
@@ -63,10 +62,23 @@ public class Main {
         databaseDAO.connect();
 
         // Perform database operations using the databaseDAO object
+        databaseDAO.deleteOldEvents();
         databaseDAO.insertArtists(artists);
         databaseDAO.insertEvents(events);
+        databaseDAO.insertTracks(artists);
 
         databaseDAO.disconnect();
+
+        System.out.println("*****CHECKING IF DATA IS THERE FOR ARTISTS*****");
+        for (Artist artist : artists) {
+            System.out.println("Artist ID: " + artist.getArtistID());
+            System.out.println("Artist name: " + artist.getName());
+            System.out.println("Artist has profile: " + artist.getHasArtistProfile());
+            System.out.println("Artist pop score: " + artist.getPopularityScore());
+            System.out.println("Artist url: " + artist.getExternalUrl());
+            System.out.println("*****");
+        }
+
     }
 
 }

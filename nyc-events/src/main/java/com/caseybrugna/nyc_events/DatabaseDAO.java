@@ -3,11 +3,13 @@ package com.caseybrugna.nyc_events;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Date;
 
 import com.wrapper.spotify.model_objects.specification.ExternalUrl;
 
@@ -25,29 +27,58 @@ public class DatabaseDAO {
         this.password = password;
     }
 
-    public void insertArtists(List<Artist> artists) {
-        String query = "INSERT INTO Events (ArtistID, Name, HasSpotifyProfile, PopularityScore, ExternalUrl) " +
-                "VALUES (?, ?, ?, ?, ?)";
+    public void deleteOldEvents() {
+        String query = "DELETE FROM Events WHERE Date < ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            for (Artist artist : artists) {
-                statement.setString(0, artist.getArtistID());
-                statement.setString(0, artist.getName());
-                statement.setBoolean(0, artist.getHasArtistProfile());
-                statement.setInt(0, artist.getPopularityScore());
-                statement.setString(0, artist.getExternalUrl());
-                
-            }
+            Date currentDate = getCurrentDate();
+            statement.setDate(1, currentDate);
+
+            int rowsDeleted = statement.executeUpdate();
+            System.out.println("Deleted " + rowsDeleted + " old events from the database.");
         } catch (SQLException e) {
+            System.err.println("Problem with deletion.");
             e.printStackTrace();
         }
     }
 
+    private Date getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        return Date.valueOf(currentDate);
+    }
 
+    public void insertArtists(List<Artist> artists) {
+        String query = "INSERT IGNORE INTO Artists (ArtistID, Name, HasSpotifyProfile, PopularityScore, ExternalUrl) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (Artist artist : artists) {
+                statement.setString(1, artist.getArtistID());
+                statement.setString(2, artist.getName());
+                statement.setBoolean(3, artist.getHasArtistProfile());
+                statement.setInt(4, artist.getPopularityScore());
+                statement.setString(5, artist.getExternalUrl());
+
+                statement.addBatch();
+
+            }
+
+            statement.executeBatch();
+            System.out.println("Artists inserted into the database.");
+
+        } catch (SQLException e) {
+            System.err.println("Problem with inserting artists.");
+            e.printStackTrace();
+        }
+    }
 
     public void insertEvents(List<Event> events) {
-        String query = "INSERT INTO Events (EventID, EventName, Date, Location, Price, Link, ImageUrl) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Events (EventID, EventName, Date, Location, Price, Link, ImageUrl, Lineup) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)" +
+                "ON DUPLICATE KEY UPDATE EventName = VALUES(EventName), Date = VALUES(Date), Location = VALUES(Location), "
+                +
+                "Price = CASE WHEN Price <> VALUES(Price) THEN VALUES(Price) ELSE Price END, " +
+                "Link = VALUES(Link), ImageUrl = VALUES(ImageUrl)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (Event event : events) {
@@ -59,6 +90,7 @@ public class DatabaseDAO {
                 statement.setString(5, event.getPrice());
                 statement.setString(6, event.getLink());
                 statement.setString(7, event.getImageUrl());
+                statement.setString(8, event.getLineupAsString());
 
                 statement.addBatch();
             }
@@ -66,7 +98,45 @@ public class DatabaseDAO {
             statement.executeBatch();
             System.out.println("Events inserted into the database.");
         } catch (SQLException e) {
+            System.err.println("Problem with inserting events.");
             e.printStackTrace();
+        }
+    }
+
+    public void insertTracks(List<Artist> artists) {
+        String query = "INSERT IGNORE INTO Tracks (TrackID, TrackName, ArtistID) VALUES (?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (Artist artist : artists) {
+                String[] trackIDs = artist.getTopTrackIDs();
+                String[] trackTitles = artist.getTopTrackTitles();
+                String artistID = artist.getArtistID();
+
+                if (trackIDs != null && trackTitles != null && artistID != null) {
+                    for (int i = 0; i < trackIDs.length; i++) {
+                        String trackID = trackIDs[i];
+                        String trackTitle = trackTitles[i];
+
+                        statement.setString(1, trackID);
+                        statement.setString(2, trackTitle);
+                        statement.setString(3, artistID);
+
+                        statement.addBatch();
+                    }
+                }
+
+            }
+
+            statement.executeBatch();
+            System.out.println("Tracks inserted into the database.");
+        } catch (SQLException e) {
+            System.err.println("Problem with inserting tracks.");
+            // Handle any additional exceptions that occur during the catch block
+            SQLException nextException = e.getNextException();
+            if (nextException != null) {
+                System.err.println("Additional exception occurred:");
+                nextException.printStackTrace();
+            }
         }
     }
 
