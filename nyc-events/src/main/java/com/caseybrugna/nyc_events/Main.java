@@ -66,6 +66,7 @@ public class Main {
         databaseDAO.insertArtists(artists);
         databaseDAO.insertEvents(events);
         databaseDAO.insertTracks(artists);
+        databaseDAO.insertEventArtists(events);
 
         databaseDAO.disconnect();
 

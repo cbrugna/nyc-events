@@ -55,16 +55,16 @@ public class Event {
     }
 
     public String generateEventID() {
-    // Concatenate relevant event details
-    String eventDetails = eventName + date.toString() + location;
+        // Concatenate relevant event details
+        String eventDetails = eventName + date.toString() + location;
 
-    // Generate a unique ID using the hashCode of the event details
-    int hashCode = eventDetails.hashCode();
-    String uniqueID = Integer.toHexString(hashCode);
+        // Generate a unique ID using the hashCode of the event details
+        int hashCode = eventDetails.hashCode();
+        String uniqueID = Integer.toHexString(hashCode);
 
-    uniqueID = uniqueID.replaceAll("[^a-zA-Z0-9]", "");
+        uniqueID = uniqueID.replaceAll("[^a-zA-Z0-9]", "");
 
-    return uniqueID;
+        return uniqueID;
     }
 
     /**
@@ -197,6 +197,31 @@ public class Event {
 
     public void addArtist(Artist artist) {
         artists.add(artist);
+    }
+
+    public String getArtistID(int i) {
+        if (artists == null) {
+            return null;
+        } else {
+
+            try {
+                if (i == 1) {
+                    String artistID = artists.get(0).getArtistID();
+                    return artistID;
+                } else if (i == 2) {
+                    String artistID = artists.get(1).getArtistID();
+                    return artistID;
+                } else if (i == 3) {
+                    String artistID = artists.get(2).getArtistID();
+                    return artistID;
+                }
+            } catch (Exception e) {
+                return null;
+            }
+
+        }
+        return null;
+
     }
 
     /**

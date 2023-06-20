@@ -48,8 +48,8 @@ public class DatabaseDAO {
     }
 
     public void insertArtists(List<Artist> artists) {
-        String query = "INSERT IGNORE INTO Artists (ArtistID, Name, HasSpotifyProfile, PopularityScore, ExternalUrl) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT IGNORE INTO Artists (ArtistID, Name, HasSpotifyProfile, PopularityScore, ExternalUrl, Genres) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (Artist artist : artists) {
@@ -58,6 +58,7 @@ public class DatabaseDAO {
                 statement.setBoolean(3, artist.getHasArtistProfile());
                 statement.setInt(4, artist.getPopularityScore());
                 statement.setString(5, artist.getExternalUrl());
+                statement.setString(6, artist.getArtistGenresAsString());
 
                 statement.addBatch();
 
@@ -73,7 +74,7 @@ public class DatabaseDAO {
     }
 
     public void insertEvents(List<Event> events) {
-        String query = "INSERT INTO Events (EventID, EventName, Date, Location, Price, Link, ImageUrl, Lineup) " +
+        String query = "INSERT IGNORE INTO Events (EventID, EventName, Date, Location, Price, Link, ImageUrl, Lineup) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)" +
                 "ON DUPLICATE KEY UPDATE EventName = VALUES(EventName), Date = VALUES(Date), Location = VALUES(Location), "
                 +
@@ -137,6 +138,29 @@ public class DatabaseDAO {
                 System.err.println("Additional exception occurred:");
                 nextException.printStackTrace();
             }
+        }
+    }
+
+    public void insertEventArtists(List<Event> events) {
+        String query = "INSERT IGNORE INTO EventArtists (EventID, ArtistID1, ArtistID2, ArtistID3) VALUES (?, ?, ?, ?)";
+        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (Event event : events) {
+
+                statement.setString(1, event.getEventID());
+
+                statement.setString(2, event.getArtistID(1));
+                statement.setString(3, event.getArtistID(2));
+                statement.setString(4, event.getArtistID(3));
+
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+            System.out.println("Events inserted into the database.");
+        } catch (SQLException e) {
+            System.err.println("Problem with inserting events.");
+            e.printStackTrace();
         }
     }
 

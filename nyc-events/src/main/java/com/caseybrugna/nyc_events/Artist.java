@@ -1,7 +1,8 @@
 package com.caseybrugna.nyc_events;
 
 /**
- * A class representing an Artist with their details fetched from the Spotify API.
+ * A class representing an Artist with their details fetched from the Spotify
+ * API.
  */
 public class Artist {
     private String name;
@@ -16,10 +17,12 @@ public class Artist {
 
     /**
      * Constructor for the Artist class.
-     * Initializes an Artist object with the given name and fetches their details from the Spotify API.
+     * Initializes an Artist object with the given name and fetches their details
+     * from the Spotify API.
      *
-     * @param name The name of the artist.
-     * @param spotifyApiClient The SpotifyAPIClient object to use for fetching artist details.
+     * @param name             The name of the artist.
+     * @param spotifyApiClient The SpotifyAPIClient object to use for fetching
+     *                         artist details.
      */
     public Artist(String name, SpotifyAPIClient spotifyApiClient) {
         this.name = name;
@@ -85,6 +88,23 @@ public class Artist {
         return artistGenres;
     }
 
+    public String getArtistGenresAsString() {
+        if (artistGenres == null || artistGenres.length == 0) {
+            return null;
+        } else if (artistGenres.length == 1) {
+            return artistGenres[0];
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < artistGenres.length; i++) {
+                sb.append(artistGenres[i]);
+                if (i != artistGenres.length - 1) {
+                    sb.append(", ");
+                }
+            }
+            return sb.toString();
+        }
+    }
+
     /**
      * Returns the popularity score of the artist on Spotify.
      *
@@ -112,8 +132,6 @@ public class Artist {
         return hasSpotifyProfile;
     }
 
-
-
     /**
      * Creates a Google search URL with the provided search text.
      *
@@ -127,8 +145,9 @@ public class Artist {
     }
 
     /**
-     * Returns a stringrepresentation of the Artist object, including all of its details.
-
+     * Returns a stringrepresentation of the Artist object, including all of its
+     * details.
+     * 
      * @return A string representation of the Artist object.
      */
     @Override
