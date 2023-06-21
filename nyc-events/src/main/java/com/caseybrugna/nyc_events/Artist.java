@@ -1,5 +1,9 @@
 package com.caseybrugna.nyc_events;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
+
 /**
  * A class representing an Artist with their details fetched from the Spotify
  * API.
@@ -140,7 +144,13 @@ public class Artist {
      */
     private String createGoogleSearch(String searchText) {
         String baseUrl = "https://www.google.com/search?q=";
-        String encodedSearchText = java.net.URLEncoder.encode(searchText, java.nio.charset.StandardCharsets.UTF_8);
+        String encodedSearchText;
+        try {
+            encodedSearchText = URLEncoder.encode(searchText, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
         return baseUrl + encodedSearchText;
     }
 

@@ -1,13 +1,20 @@
 package com.caseybrugna.nyc_events;
 
 import java.util.List;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.util.ArrayList;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /**
  * The main class that coordinates the scraping of events and artist data.
  */
+@SpringBootApplication  
 public class Main {
     /**
      * The main method of the application.
@@ -23,7 +30,7 @@ public class Main {
      * program terminates.
      *
      * @param args The command line arguments. These are not used in this method.
-     */
+     */  
     public static void main(String[] args) {
         List<Event> events = DiceScraper.scrapeEvents();
         List<Artist> artists = new ArrayList<>();
