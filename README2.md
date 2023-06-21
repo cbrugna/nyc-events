@@ -1,0 +1,7 @@
+This file is for documenting the project and journaling what has gone on so far.
+
+Tue June 20
+****
+As of right now, here are the current classes: Artist.java, DatabaseDAO.java, DiceScraper.java, Event.java, Main.java, and SpotifyAPIClient.java. The program current works by calling functions from the DiceScraper.java class to scrape Dice.fm. From there, Artist and Event objects get created. As this happens, some class variables of the objects are initialied using the SpotifyAPIClient to retrieve more information about the artist. Then, the DatabaseDAO class handles storing the data into the SQL database. 
+
+Now that the scraping part is complete (things might get refactored and changed, but it works and the necessary data is scraped), the next part of the project must be planned. Today, I setup Springboot so that the project can utilize some more services to create the API that the web application will need to interact with to retrieve the proper information. In planning that out, I'd like to move to more of a MVC model by separating classes, as I did not expect the project to get this "big." As the project progresses, it is apparent that some things need replanning, including the code that has already been written. Some information stored in the database might not be necessary. Also, some of the ways that different types and differences between names and IDs from the spotify API could have been handled better.
