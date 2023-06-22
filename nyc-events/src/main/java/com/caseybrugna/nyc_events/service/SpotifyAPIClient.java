@@ -1,23 +1,24 @@
-package com.caseybrugna.nyc_events;
+package com.caseybrugna.nyc_events.service;
 
 import io.github.cdimascio.dotenv.Dotenv;
-
-import java.io.IOException;
-import java.util.Arrays;
-
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
-import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
-import com.wrapper.spotify.requests.data.search.SearchItemRequest;
-import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.model_objects.specification.Artist;
 import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.Track;
+import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import com.wrapper.spotify.requests.data.artists.GetArtistRequest;
 import com.wrapper.spotify.requests.data.artists.GetArtistsTopTracksRequest;
+import com.wrapper.spotify.requests.data.search.simplified.SearchArtistsRequest;
+import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 
 import com.neovisionaries.i18n.CountryCode;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class to interact with the Spotify API and retrieve artist and track data.
@@ -26,6 +27,7 @@ public class SpotifyAPIClient {
     private static final String CLIENT_ID;
     private static final String CLIENT_SECRET;
     private final SpotifyApi spotifyApi;
+    private static final Logger LOGGER = Logger.getLogger(SpotifyAPIClient.class.getName());
 
     static {
         Dotenv dotenv = Dotenv.configure()
@@ -47,17 +49,19 @@ public class SpotifyAPIClient {
                 .setClientId(CLIENT_ID)
                 .setClientSecret(CLIENT_SECRET)
                 .build();
+        setClientCredentials();
+    }
 
-        // Retrieve a client token for authorization
+    /**
+     * Method to set client credentials.
+     */
+    private void setClientCredentials() {
         ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
         try {
             ClientCredentials clientCredentials = clientCredentialsRequest.execute();
-
-            // Set the access token on the SpotifyApi object
             spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-
-        } catch (Exception e) {
-            System.out.println("An error occurred while retrieving client credentials: " + e.getMessage());
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while setting client credentials: " + e.getMessage(), e);
         }
     }
 
@@ -69,49 +73,33 @@ public class SpotifyAPIClient {
      * @return The ID of the artist, or null if no artist was found.
      */
     public String getArtistID(String artistName) {
+        SearchArtistsRequest searchRequest = spotifyApi.searchArtists(artistName).build();
         try {
-            // Create a SearchItemRequest to search for the artist
-            SearchItemRequest searchRequest = spotifyApi.searchItem(artistName, "artist").build();
-
-            // Execute the search request and retrieve the search results
-            Paging<Artist> artistSearchResults = searchRequest.execute().getArtists();
-
-            // Iterate over the search results to find the matching artist
-            for (Artist artist : artistSearchResults.getItems()) {
-                // Check if the artist name matches exactly
-                if (artist.getName().equalsIgnoreCase(artistName)) {
-                    // Return the artist ID
-                    return artist.getId();
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred while searching for the artist: " + e.getMessage());
+            Paging<Artist> artistSearchResults = searchRequest.execute();
+            return Arrays.stream(artistSearchResults.getItems())
+                    .filter(artist -> artist.getName().equalsIgnoreCase(artistName))
+                    .map(Artist::getId)
+                    .findFirst()
+                    .orElse(null);
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while searching for the artist: " + e.getMessage(), e);
+            return null;
         }
-
-        // If no matching artist is found, return null
-        return null;
     }
 
     /**
      * Retrieves the top tracks for a given artist from the Spotify API.
      *
-     * @param artistID The ID of the artistto retrieve top tracks for.
+     * @param artistID The ID of the artist to retrieve top tracks for.
      * @return An array of track IDs for the artist's top tracks.
      */
     public String[] getArtistTopTracks(String artistID) {
+        GetArtistsTopTracksRequest request = spotifyApi.getArtistsTopTracks(artistID, CountryCode.US).build();
         try {
-            GetArtistsTopTracksRequest request = spotifyApi.getArtistsTopTracks(artistID, CountryCode.US).build();
             Track[] tracks = request.execute();
-
-            String[] trackIDs = new String[tracks.length];
-            for (int i = 0; i < tracks.length; i++) {
-                trackIDs[i] = tracks[i].getId();
-            }
-
-            return trackIDs;
-
+            return Arrays.stream(tracks).map(Track::getId).toArray(String[]::new);
         } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
-            System.err.println("An error occurred while fetching the artist's top tracks: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error occurred while fetching the artist's top tracks: " + e.getMessage(), e);
             return new String[0]; // Return an empty array in case of error
         }
     }
@@ -122,19 +110,13 @@ public class SpotifyAPIClient {
      * @param trackIDs An array of track IDs to retrieve titles for.
      * @return An array of track titles corresponding to the provided track IDs.
      */
-    public String[] getArtistTopTrackTitles(String[] trackIDs) {
+    public String[] getTrackTitles(String[] trackIDs) {
+        GetSeveralTracksRequest request = spotifyApi.getSeveralTracks(trackIDs).build();
         try {
-            GetSeveralTracksRequest request = spotifyApi.getSeveralTracks(trackIDs).build();
             Track[] tracks = request.execute();
-
-            String[] trackTitles = new String[tracks.length];
-            for (int i = 0; i < tracks.length; i++) {
-                trackTitles[i] = tracks[i].getName();
-            }
-
-            return trackTitles;
+            return Arrays.stream(tracks).map(Track::getName).toArray(String[]::new);
         } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
-            System.err.println("An error occurred while fetching track titles: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error occurred while fetching track titles: " + e.getMessage(), e);
             return new String[0]; // Return an empty array in case of error
         }
     }
@@ -146,24 +128,13 @@ public class SpotifyAPIClient {
      * @return An array of the top three genres associated with the artist.
      */
     public String[] getArtistGenres(String artistID) {
+        GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
         try {
-            // Create a GetArtistRequest with the artist ID
-            GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
-
-            // Execute the request and retrieve the artist object
             Artist artist = getArtistRequest.execute();
-
-            // Get the genres associated with the artist
             String[] genres = artist.getGenres();
-
-            // Return the top three genres
-            if (genres.length > 3) {
-                return Arrays.copyOfRange(genres, 0, 3);
-            } else {
-                return genres;
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching the artist's genres: " + e.getMessage());
+            return Arrays.copyOfRange(genres, 0, Math.min(genres.length, 3));
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while fetching the artist's genres: " + e.getMessage(), e);
             return new String[0]; // Return an empty array in case of error
         }
     }
@@ -175,18 +146,12 @@ public class SpotifyAPIClient {
      * @return The artist's popularity score, or -1 if an error occurred.
      */
     public int getPopularityScore(String artistID) {
-        try {
-            // Create a GetArtistRequest with the artist ID
         GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
-
-        // Execute the request and retrieve the artist object
-        Artist artist = getArtistRequest.execute();
-
-        int popularityScore = artist.getPopularity();
-        return popularityScore;
-
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching the popularity score: " + e.getMessage());
+        try {
+            Artist artist = getArtistRequest.execute();
+            return artist.getPopularity();
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while fetching the popularity score: " + e.getMessage(), e);
             return -1; // Return -1 in case of error
         }
     }
@@ -197,22 +162,15 @@ public class SpotifyAPIClient {
      * @param artistID The ID of the artist to retrieve the Spotify link for.
      * @return The artist's Spotify link, or null if an error occurred.
      */
-    public String getExternalUrl(String artistID) {
+    public String getArtistSpotifyUrl(String artistID) {
+        GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
         try {
-            // Create a GetArtistRequest with the artist ID
-            GetArtistRequest getArtistRequest = spotifyApi.getArtist(artistID).build();
-
-            // Execute the request and retrieve the artist object
             Artist artist = getArtistRequest.execute();
-
-            String spotifyLink = artist.getExternalUrls().get("spotify");
-
-            return spotifyLink;
-
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching the artist's external URLs: " + e.getMessage());
+            return artist.getExternalUrls().get("spotify");
+        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while fetching the artist's external URLs: " + e.getMessage(), e);
             return null; // Return null in case of error
         }
     }
-
 }
+
