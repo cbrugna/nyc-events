@@ -9,10 +9,9 @@ import java.util.HashMap;
 public class Artist {
     private String artistID;
     private String artistName;
-    private Map<String, String> trackMap;
-    private boolean hasArtistProfile;
-    private int popularityScore;
-    private String externalUrls;
+    private Map<String, String> artistTrackMap;
+    private int artistPopularityScore;
+    private String artistUrl;
     private String[] artistGenres;
 
     /**
@@ -24,10 +23,9 @@ public class Artist {
     public Artist(String artistName) {
         this.artistID = "";
         this.artistName = artistName;
-        this.trackMap = new HashMap<>();
-        this.hasArtistProfile = false;
-        this.popularityScore = -1;
-        this.externalUrls = "";
+        this.artistTrackMap = new HashMap<>();
+        this.artistPopularityScore = -1;
+        this.artistUrl = "";
         this.artistGenres = new String[0];
     }
 
@@ -47,28 +45,28 @@ public class Artist {
         this.artistName = artistName;
     }
 
-    public boolean hasArtistProfile() {
-        return hasArtistProfile;
+    public Map<String, String> getArtistTrackMap() {
+        return artistTrackMap;
     }
 
-    public void setHasArtistProfile(boolean hasArtistProfile) {
-        this.hasArtistProfile = hasArtistProfile;
+    public void setArtistTrackMap(Map<String, String> artistTrackMap) {
+        this.artistTrackMap = artistTrackMap;
     }
 
-    public int getPopularityScore() {
-        return popularityScore;
+    public int getArtistPopularityScore() {
+        return artistPopularityScore;
     }
 
-    public void setPopularityScore(int popularityScore) {
-        this.popularityScore = popularityScore;
+    public void setArtistPopularityScore(int artistPopularityScore) {
+        this.artistPopularityScore = artistPopularityScore;
     }
 
-    public String getExternalUrls() {
-        return externalUrls;
+    public String getArtistUrl() {
+        return artistUrl;
     }
 
-    public void setExternalUrls(String externalUrls) {
-        this.externalUrls = externalUrls;
+    public void setArtistUrl(String artistUrl) {
+        this.artistUrl = artistUrl;
     }
 
     public String[] getArtistGenres() {
@@ -83,9 +81,8 @@ public class Artist {
     public String toString() {
         return "Artist ID: " + artistID + "\n"
                 + "Artist Name: " + artistName + "\n"
-                + "Has Artist Profile: " + hasArtistProfile + "\n"
-                + "Popularity Score: " + popularityScore + "\n"
-                + "External URLs: " + externalUrls + "\n"
+                + "Popularity Score: " + artistPopularityScore + "\n"
+                + "External URLs: " + artistUrl + "\n"
                 + "Artist Genres: " + artistGenres.length;
     }
 }

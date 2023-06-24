@@ -30,10 +30,9 @@ public class Event {
      * @param imageUrl      the link to the displayed image -- AS IS FROM DICE.FM
      * @param artistsString the list of artists (uncleaned) -- AS IS FROM DICE.FM
      */
-    public Event(String eventName, java.sql.Date date, String location, String price, String link, String imageUrl,
-            String artistsString) {
+    public Event(String eventName, String dateString, String location, String price, String link, String imageUrl, String artistsString) {
         this.eventName = eventName;
-        this.date = date;
+        this.dateString = dateString;
         this.location = location;
         this.price = price;
         this.link = link;

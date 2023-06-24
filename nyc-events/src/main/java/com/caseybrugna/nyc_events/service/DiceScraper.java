@@ -41,7 +41,7 @@ public class DiceScraper {
         WebDriver driver = setupWebDriver();
         driver.get(url);
         dismissCookieConsentPopup(driver);
-        loadAllEvents(driver);
+        //loadAllEvents(driver);
         List<Event> events = extractEventDetails(driver);
         driver.quit();
         return events;
@@ -137,6 +137,8 @@ public class DiceScraper {
             String link = eventElement.findElement(By.cssSelector("a.styles__EventCardLink-mwubo3-5")).getAttribute("href");
             String imageUrl = eventElement.findElement(By.cssSelector("img.styles__Image-mwubo3-3")).getAttribute("src");
             String artistsString = extractArtistsString(link);
+            //String eventName, java.sql.Date date, String location, String price, String link, String imageUrl,
+            //String artistsString
             return new Event(eventName, date, location, price, link, imageUrl, artistsString);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while extracting event details:", e);

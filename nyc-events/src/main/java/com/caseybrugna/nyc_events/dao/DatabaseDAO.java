@@ -1,4 +1,4 @@
-package com.caseybrugna.nyc_events.dao;
+/*package com.caseybrugna.nyc_events.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -187,3 +187,4 @@ public class DatabaseDAO {
     }
 
 }
+*/

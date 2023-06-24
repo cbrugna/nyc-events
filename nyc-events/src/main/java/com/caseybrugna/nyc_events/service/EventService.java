@@ -20,22 +20,14 @@ public class EventService {
 
     public EventService(List<Event> events) {
         this.events = events;
-        // fill events
     }
-
-    // To be filled:
-    // private java.sql.Date date;
-    // private List<Artist> lineup;
-    // private String eventID;
 
     public void fillEvents() {
         for (Event event : events) {
             event.setDate(formatDate(event.getDateString()));
-            event.setLineup(fillEventLinup(event.getArtistsString()));
+            //event.setLineup(fillEventLineup(event.getArtistsString()));
+            fillEventLineup(event.getArtistsString());
             event.setEventID(generateEventID(event.getEventName(), event.getDate(), event.getLocation()));
-
-            // Loop through each event
-                // event.fillLineup
         }
     }
 
@@ -58,9 +50,9 @@ public class EventService {
         return Integer.toHexString(eventDetails.hashCode()).replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public List<Artist> fillEventLinup(String artistsString) {
+    public static void fillEventLineup(String artistsString) {
         if (artistsString == null || artistsString.isEmpty()) {
-            return null;
+            return;
         }
         
 
@@ -76,12 +68,14 @@ public class EventService {
             }
 
             Artist newArtist = new Artist(artistName);
-            newArtist = ArtistService.fillArtist(newArtist);
             lineup.add(newArtist);
 
         }
 
-        return lineup;
+        ArtistService artistService = new ArtistService();
+        for (Artist artistToBeFilled : lineup) {
+            ArtistService.fillArtist(artistToBeFilled);
+        }
     }
 
 
