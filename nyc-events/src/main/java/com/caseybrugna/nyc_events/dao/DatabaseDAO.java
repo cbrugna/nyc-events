@@ -1,4 +1,4 @@
-package com.caseybrugna.nyc_events;
+package com.caseybrugna.nyc_events.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Date;
 
+import com.caseybrugna.nyc_events.model.Artist;
+import com.caseybrugna.nyc_events.model.Event;
 import com.wrapper.spotify.model_objects.specification.ExternalUrl;
 
 import javassist.bytecode.stackmap.BasicBlock.Catch;

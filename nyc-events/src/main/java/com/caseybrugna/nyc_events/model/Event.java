@@ -46,10 +46,6 @@ public class Event {
         this.eventID = "";
     }
 
-    public void addArtistToLineup(Artist artist) {
-        lineup.add(artist);
-    }
-
     // Getter methods for each field
     public String getEventID() {
         return eventID;

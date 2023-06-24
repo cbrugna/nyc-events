@@ -1,180 +1,98 @@
-package com.caseybrugna.nyc_events.service;
+package com.caseybrugna.nyc_events;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.caseybrugna.nyc_events.model.Event;
-
-import org.openqa.selenium.NoSuchElementException;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.time.Duration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.caseybrugna.nyc_events.dao.DatabaseDAO;
+import com.caseybrugna.nyc_events.model.Artist;
+import com.caseybrugna.nyc_events.model.Event;
+import com.caseybrugna.nyc_events.service.DiceScraper;
+import com.caseybrugna.nyc_events.service.SpotifyAPIClient;
+
+import java.util.ArrayList;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * A class that provides methods to scrape event data from a website and store
- * it in Event objects.
+ * The main class that coordinates the scraping of events and artist data.
  */
-public class DiceScraper {
-    private static final Logger LOGGER = Logger.getLogger(DiceScraper.class.getName());
-
+@SpringBootApplication  
+public class Main {
     /**
-     * Scrapes event data from the "https://dice.fm/browse/new-york/music/dj" website.
-     * It loads all available events by clicking on the "Load more" button until it's no longer available.
-     * Then, it extracts the details of each event and creates an Event object for each one.
+     * The main method of the application.
+     * It first scrapes event data from the Dice website using the DiceScraper
+     * class.
+     * Then, it creates a SpotifyAPIClient object and uses it to retrieve artist
+     * data for each artist in each event's lineup.
+     * If an artist exists on Spotify, an Artist object is created for them and
+     * added to the event.
+     * If an error occurs during the creation of an Artist object, it is logged and
+     * the program continues with the next artist.
+     * If an error occurs during the scraping of events, it is logged and the
+     * program terminates.
      *
-     * @return A list of Event objects, each representing an event extracted from the website.
-     * @throws RuntimeException If there's an error during website data retrieval or event detail extraction.
-     */
-    public static List<Event> scrapeEvents() {
-        String url = "https://dice.fm/browse/new-york/music/dj";
-        WebDriver driver = setupWebDriver();
-        driver.get(url);
-        dismissCookieConsentPopup(driver);
-        loadAllEvents(driver);
-        List<Event> events = extractEventDetails(driver);
-        driver.quit();
-        return events;
-    }
-
-    /**
-     * Sets up the WebDriver needed for web scraping operations.
-     *
-     * @return An instance of WebDriver.
-     */
-    private static WebDriver setupWebDriver() {
-        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
-        WebDriver driver = new ChromeDriver();
-        return driver;
-    }
-
-    /**
-     * Dismisses the cookie consent popup on the website.
-     *
-     * @param driver The WebDriver instance used for web scraping operations.
-     */
-    private static void dismissCookieConsentPopup(WebDriver driver) {
+     * @param args The command line arguments. These are not used in this method.
+     */  
+    public static void main(String[] args) {
+        List<Event> events = DiceScraper.scrapeEvents();
+        List<Artist> artists = new ArrayList<>();
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement allowCookiesButton = wait.until(ExpectedConditions
-                    .elementToBeClickable(By.cssSelector(".ch2-btn.ch2-allow-all-btn.ch2-btn-primary")));
-            allowCookiesButton.click();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while trying to dismiss the cookies consent popup: " + e.getMessage(), e);
-        }
-    }
 
-    /**
-     * Loads all available events by clicking on the "Load more" button until it's no longer available.
-     *
-     * @param driver The WebDriver instance used for web scraping operations.
-     */
-    private static void loadAllEvents(WebDriver driver) {
-        try {
-            while (true) {
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement loadMoreDiv = driver
-                        .findElement(By.cssSelector("div.styles__LoadMoreRow-sc-1505uh6-1.cxEHUh"));
-                WebElement loadMoreButton = loadMoreDiv
-                        .findElement(By.cssSelector("button.ButtonBase-sc-1lkfwal-0.Button-b7vefn-0.gIWihf.cIyxHS"));
-                wait.until(ExpectedConditions.elementToBeClickable(loadMoreButton));
-                loadMoreButton.click();
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    LOGGER.log(Level.SEVERE, "An error occurred while loading more events: " + e.getMessage(), e);
+            SpotifyAPIClient spotify = new SpotifyAPIClient();
+
+            for (Event event : events) {
+                if (event.getLineup() != null) {
+                    for (String artistString : event.getLineup()) {
+                        try {
+                            Artist artist = new Artist(artistString, spotify);
+                            artists.add(artist);
+                            event.addArtist(artist);
+                            System.out.println(artist);
+                            System.out.println();
+                        } catch (RuntimeException e) {
+                            System.err.println("An error occurred while creating " + artistString + e.getMessage());
+                        }
+                    }
                 }
             }
-        } catch (NoSuchElementException e) {
-            // All events have been loaded
-        }
-    }
-
-    /**
-     * Extracts the details of each event from the loaded website data and creates a list of Event objects.
-     *
-     * @param driver The WebDriver instance used for web scraping operations.
-     * @return A list of Event objects, each representing an event extracted from the website.
-     */
-    private static List<Event> extractEventDetails(WebDriver driver) {
-        List<Event> events = new ArrayList<>();
-        List<WebElement> eventElements = driver.findElements(By.cssSelector("div.EventCard__Event-sc-95ckmb-1"));
-        for (WebElement eventElement : eventElements) {
-            try {
-                Event event = extractEvent(eventElement);
-                events.add(event);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "An error occurred while extracting event details: " + e.getMessage(), e);
-            }
-        }
-        return events;
-    }
-
-    /**
-     * Extracts the details of an event from a given WebElement.
-     * It finds specific details such as event name, date, location, price, link, image URL, and artists.
-     * Then, creates and returns an Event object with these details.
-     *
-     * @param eventElement The WebElement from which to extract event details.
-     * @return An Event object with the details extracted from the provided WebElement.
-     */
-    private static Event extractEvent(WebElement eventElement) {
-        try {
-            String eventName = extractText(eventElement, "div.styles__Title-mwubo3-6");
-            String date = extractText(eventElement, "div.styles__Date-mwubo3-8");
-            String location = extractText(eventElement, "div.styles__Venue-mwubo3-7");
-            String price = extractText(eventElement, "div.styles__Price-mwubo3-9");
-            String link = eventElement.findElement(By.cssSelector("a.styles__EventCardLink-mwubo3-5")).getAttribute("href");
-            String imageUrl = eventElement.findElement(By.cssSelector("img.styles__Image-mwubo3-3")).getAttribute("src");
-            String artistsString = extractArtistsString(link);
-            return new Event(eventName, date, location, price, link, imageUrl, artistsString);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while extracting event details:", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Extracts text from a WebElement using a given CSS selector.
-     * If the target element doesn't exist, it returns an empty string.
-     *
-     * @param element     The WebElement from which to extract text.
-     * @param cssSelector The CSS selector to locate the target element within the provided WebElement.
-     * @return The extracted text as a String, or an empty string if the target element is not found.
-     */
-    private static String extractText(WebElement element, String cssSelector) {
-        WebElement targetElement = element.findElement(By.cssSelector(cssSelector));
-        return targetElement != null ? targetElement.getText() : "";
-    }
-
-    /**
-     * Extracts the lineup of artists from an event page by connecting to the event's URL.
-     * If an artist lineup isn't found or an error occurs during extraction, it returns null.
-     *
-     * @param eventLink The URL of the event page from which to extract the artist lineup.
-     * @return A String representing the artist lineup, or null if no lineup is found or an error occurs during extraction.
-     */
-    private static String extractArtistsString(String eventLink) {
-        try {
-            Document eventDocument = Jsoup.connect(eventLink).get();
-            Element artistElement = eventDocument.selectFirst("div.EventDetailsLineup__ArtistTitle-gmffoe-10");
-            if (artistElement != null) {
-                return artistElement.text();
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while extracting the lineup: " + e.getMessage(), e);
+        } catch (RuntimeException e) {
+            System.err.println("An error occurred while scraping the events in the main: " + e.getMessage());
         }
 
-        return null;
+        String url = "jdbc:mysql://localhost:3306/events_db?serverTimezone=UTC";
+
+        Dotenv dotenv = Dotenv.configure()
+                .directory("src/main/resources")
+                .load();
+        String user = dotenv.get("DB_USER");
+        String password = dotenv.get("DB_PASSWORD");
+
+        DatabaseDAO databaseDAO = new DatabaseDAO(url, user, password);
+        databaseDAO.connect();
+
+        // Perform database operations using the databaseDAO object
+        databaseDAO.deleteOldEvents();
+        databaseDAO.insertArtists(artists);
+        databaseDAO.insertEvents(events);
+        databaseDAO.insertTracks(artists);
+        databaseDAO.insertEventArtists(events);
+
+        databaseDAO.disconnect();
+
+        System.out.println("*****CHECKING IF DATA IS THERE FOR ARTISTS*****");
+        for (Artist artist : artists) {
+            System.out.println("Artist ID: " + artist.getArtistID());
+            System.out.println("Artist name: " + artist.getName());
+            System.out.println("Artist has profile: " + artist.getHasArtistProfile());
+            System.out.println("Artist pop score: " + artist.getPopularityScore());
+            System.out.println("Artist url: " + artist.getExternalUrl());
+            System.out.println("*****");
+        }
+
     }
+
 }

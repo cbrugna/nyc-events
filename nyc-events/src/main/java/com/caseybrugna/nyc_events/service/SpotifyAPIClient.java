@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A class to interact with the Spotify API and retrieve artist and track data.
@@ -39,10 +43,13 @@ public class SpotifyAPIClient {
 
     /**
      * Constructor for the SpotifyAPIClient class.
-     * Initializes the SpotifyApi instance with client ID and client secret from the .env file.
-     * Retrieves a client token for authorization and sets it on the SpotifyApi object.
+     * Initializes the SpotifyApi instance with client ID and client secret from the
+     * .env file.
+     * Retrieves a client token for authorization and sets it on the SpotifyApi
+     * object.
      *
-     * @throws RuntimeException If there's an error while retrieving client credentials.
+     * @throws RuntimeException If there's an error while retrieving client
+     *                          credentials.
      */
     public SpotifyAPIClient() {
         spotifyApi = new SpotifyApi.Builder()
@@ -122,7 +129,8 @@ public class SpotifyAPIClient {
     }
 
     /**
-     * Retrieves the top three genres associated with a given artist from the Spotify API.
+     * Retrieves the top three genres associated with a given artist from the
+     * Spotify API.
      *
      * @param artistID The ID of the artist to retrieve genres for.
      * @return An array of the top three genres associated with the artist.
@@ -172,5 +180,19 @@ public class SpotifyAPIClient {
             return null; // Return null in case of error
         }
     }
-}
 
+    public Map<String, String> getTrackMap(String artistID) {
+
+        Map<String, String> trackMap = new HashMap<>();
+        String[] topTrackIDs = getArtistTopTracks(artistID);
+        String[] topTrackTitles = getTrackTitles(topTrackIDs);
+
+        int amtOfTracks = Math.min(5, Math.min(topTrackIDs.length, topTrackTitles.length));
+        for (int i = 0; i < amtOfTracks; i++) {
+            trackMap.put(topTrackTitles[i], topTrackIDs[i]);
+        }
+
+        return trackMap;
+
+    }
+}
