@@ -25,15 +25,15 @@ public class EventService {
     public void fillEvents() {
         for (Event event : events) {
             event.setDate(formatDate(event.getDateString()));
-            //event.setLineup(fillEventLineup(event.getArtistsString()));
-            fillEventLineup(event.getArtistsString());
+            event.setLineup(fillEventLineup(event.getArtistsString()));
+            //fillEventLineup(event.getArtistsString());
             event.setEventID(generateEventID(event.getEventName(), event.getDate(), event.getLocation()));
         }
     }
 
     public java.sql.Date formatDate(String dateString) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, d[dd] MMM", Locale.ENGLISH);
             TemporalAccessor temporalAccessor = formatter.parse(dateString);
             LocalDate localDate = LocalDate.of(LocalDate.now().getYear(),
                     temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
@@ -50,13 +50,14 @@ public class EventService {
         return Integer.toHexString(eventDetails.hashCode()).replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public static void fillEventLineup(String artistsString) {
+    public static List<Artist> fillEventLineup(String artistsString) {
+        List<Artist> lineup = new ArrayList<>();
         if (artistsString == null || artistsString.isEmpty()) {
-            return;
+            return lineup;
         }
         
 
-        List<Artist> lineup = new ArrayList<>();
+        
         String[] artistNames = artistsString.split(",");
 
         for (int i = 0; i < artistNames.length; i++) {
@@ -72,10 +73,12 @@ public class EventService {
 
         }
 
-        ArtistService artistService = new ArtistService();
+
         for (Artist artistToBeFilled : lineup) {
             ArtistService.fillArtist(artistToBeFilled);
         }
+
+        return lineup;
     }
 
 

@@ -24,11 +24,11 @@ public class ArtistService {
      * Constructs an ArtistService object.
      */
     public ArtistService() {
-        spotifyApiClient = new SpotifyAPIClient();
         this.artists = new ArrayList<>();
     }
 
     public static void fillArtist(Artist artist) {
+        spotifyApiClient = new SpotifyAPIClient();
         String artistName = artist.getArtistName();
         String artistID = spotifyApiClient.getArtistID(artistName);
 

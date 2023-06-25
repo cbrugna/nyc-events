@@ -185,6 +185,11 @@ public class SpotifyAPIClient {
 
         Map<String, String> trackMap = new HashMap<>();
         String[] topTrackIDs = getArtistTopTracks(artistID);
+
+        if (topTrackIDs.length == 0) {
+            return trackMap;
+        }
+
         String[] topTrackTitles = getTrackTitles(topTrackIDs);
 
         int amtOfTracks = Math.min(5, Math.min(topTrackIDs.length, topTrackTitles.length));
