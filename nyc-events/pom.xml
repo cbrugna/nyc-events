@@ -4,6 +4,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.5.1</version>
+    <relativePath/>
+  </parent>
+
   <groupId>com.caseybrugna</groupId>
   <artifactId>nyc-events</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -15,8 +22,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <maven.plugin.validation>BRIEF</maven.plugin.validation>
     <maven.site.skip>true</maven.site.skip>
   </properties>
@@ -43,15 +50,17 @@
       <artifactId>dotenv-java</artifactId>
       <version>2.2.0</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
       <version>1.7.32</version>
     </dependency>
+    -->
     <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>4.10.0</version>
+        <version>3.141.59</version>
     </dependency>
     <dependency>
         <groupId>io.github.bonigarcia</groupId>
@@ -64,18 +73,44 @@
           </exclusion>
         </exclusions>
     </dependency>
+
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.22</version>
+      <version>8.0.26</version>
     </dependency>
 
+
     <!-- SPRINGBOOT START -->
+
+
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter</artifactId>
-        <version>2.5.1</version>
     </dependency>
+
+    <!-- Spring Data JPA -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <!-- MySQL Connector 
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+    -->
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-logging</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+    </dependency>
+
 
     <!-- SPRINGBOOT END -->
 
@@ -128,6 +163,8 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>4.0.0-M8</version>
         </plugin>
+
+        <!--
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
@@ -136,6 +173,7 @@
               <mainClass>com.caseybrugna.nyc_events.Main</mainClass>
             </configuration>
         </plugin>
+        -->
 
         <!-- SPRINGBOOT START-->
 
@@ -152,6 +190,9 @@
         <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <mainClass>com.caseybrugna.nyc_events.Main</mainClass>
+            </configuration>
         </plugin>
 
         <!-- SPRINGBOOT END-->

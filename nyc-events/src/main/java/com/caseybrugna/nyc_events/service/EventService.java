@@ -12,28 +12,34 @@ import java.util.logging.Logger;
 
 import com.caseybrugna.nyc_events.model.Event;
 import com.caseybrugna.nyc_events.model.Artist;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EventService {
-    private static final Logger LOGGER = Logger.getLogger(ArtistService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EventService.class.getName());
 
-    private List<Event> events = new ArrayList<>();
+    private final List<Event> events;
 
-    public EventService(List<Event> events) {
+    private final ArtistService artistService;
+
+    @Autowired
+    public EventService(List<Event> events, ArtistService artistService) {
         this.events = events;
+        this.artistService = artistService;
     }
 
     public void fillEvents() {
         for (Event event : events) {
             event.setDate(formatDate(event.getDateString()));
             event.setLineup(fillEventLineup(event.getArtistsString()));
-            //fillEventLineup(event.getArtistsString());
             event.setEventID(generateEventID(event.getEventName(), event.getDate(), event.getLocation()));
         }
     }
 
     public java.sql.Date formatDate(String dateString) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, d[dd] MMM", Locale.ENGLISH);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d[dd]", Locale.ENGLISH);
             TemporalAccessor temporalAccessor = formatter.parse(dateString);
             LocalDate localDate = LocalDate.of(LocalDate.now().getYear(),
                     temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
@@ -50,14 +56,12 @@ public class EventService {
         return Integer.toHexString(eventDetails.hashCode()).replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public static List<Artist> fillEventLineup(String artistsString) {
+    public List<Artist> fillEventLineup(String artistsString) {
         List<Artist> lineup = new ArrayList<>();
         if (artistsString == null || artistsString.isEmpty()) {
             return lineup;
         }
-        
 
-        
         String[] artistNames = artistsString.split(",");
 
         for (int i = 0; i < artistNames.length; i++) {
@@ -70,17 +74,12 @@ public class EventService {
 
             Artist newArtist = new Artist(artistName);
             lineup.add(newArtist);
-
         }
 
-
         for (Artist artistToBeFilled : lineup) {
-            ArtistService.fillArtist(artistToBeFilled);
+            artistService.fillArtist(artistToBeFilled);
         }
 
         return lineup;
     }
-
-
-
 }

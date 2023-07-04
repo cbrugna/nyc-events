@@ -1,18 +1,28 @@
 package com.caseybrugna.nyc_events.model;
 
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
+
+import javax.persistence.*;
 
 /**
  * Represents an artist with their details.
  */
+@Entity
 public class Artist {
+    @Id
     private String artistID;
     private String artistName;
+
+    @ElementCollection
     private Map<String, String> artistTrackMap;
     private int artistPopularityScore;
     private String artistUrl;
-    private String[] artistGenres;
+
+    @ElementCollection
+    private List<String> artistGenres;
 
     /**
      * Constructs an Artist object with the specified details.
@@ -26,7 +36,7 @@ public class Artist {
         this.artistTrackMap = new HashMap<>();
         this.artistPopularityScore = -1;
         this.artistUrl = "";
-        this.artistGenres = new String[0];
+        this.artistGenres = new ArrayList<>();
     }
 
     public String getArtistID() {
@@ -69,11 +79,11 @@ public class Artist {
         this.artistUrl = artistUrl;
     }
 
-    public String[] getArtistGenres() {
+    public List<String> getArtistGenres() {
         return artistGenres;
     }
 
-    public void setArtistGenres(String[] artistGenres) {
+    public void setArtistGenres(List<String> artistGenres) {
         this.artistGenres = artistGenres;
     }
 
@@ -83,6 +93,6 @@ public class Artist {
                 + "Artist Name: " + artistName + "\n"
                 + "Popularity Score: " + artistPopularityScore + "\n"
                 + "External URLs: " + artistUrl + "\n"
-                + "Artist Genres: " + artistGenres.length;
+                + "Artist Genres: " + artistGenres.size();
     }
 }

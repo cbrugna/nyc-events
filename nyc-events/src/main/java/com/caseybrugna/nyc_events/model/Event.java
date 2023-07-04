@@ -3,10 +3,18 @@ package com.caseybrugna.nyc_events.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.*;
+
 /**
  * Represents an event with its details.
  */
+
+@Entity
 public class Event {
+    @Id
+    @Column(name = "event_id")
+    private String eventID;
+
     private String eventName;
     private String dateString;
     private String location;
@@ -16,8 +24,10 @@ public class Event {
     private String artistsString;
 
     private java.sql.Date date;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "event_id")
     private List<Artist> lineup;
-    private String eventID;
+    
 
     /**
      * Constructs an Event object with the specified details.

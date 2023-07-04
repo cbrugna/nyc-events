@@ -1,39 +1,42 @@
 package com.caseybrugna.nyc_events;
 
 import java.util.List;
-
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
-//import com.caseybrugna.nyc_events.dao.DatabaseDAO;
 import com.caseybrugna.nyc_events.model.Artist;
 import com.caseybrugna.nyc_events.model.Event;
-import com.caseybrugna.nyc_events.service.ArtistService;
 import com.caseybrugna.nyc_events.service.DiceScraper;
 import com.caseybrugna.nyc_events.service.EventService;
 import com.caseybrugna.nyc_events.service.SpotifyAPIClient;
-
-import java.util.ArrayList;
-
+import com.caseybrugna.nyc_events.service.ArtistService;
 import io.github.cdimascio.dotenv.Dotenv;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * The main class that coordinates the scraping of events and artist data.
  */
-@SpringBootApplication  
-public class Main { 
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@ComponentScan(basePackages = {"com.caseybrugna.nyc_events", "com.caseybrugna.nyc_events.config"})
+public class Main {
     public static void main(String[] args) {
-        List<Event> events = DiceScraper.scrapeEvents();
-        EventService eventService = new EventService(events);
+        Dotenv dotenv = Dotenv.configure()
+            .directory("src/main/resources")
+            .load();
+
+        ApplicationContext context = SpringApplication.run(Main.class, args);
+
+        DiceScraper diceScraper = context.getBean(DiceScraper.class);
+        EventService eventService = context.getBean(EventService.class);
+
+        List<Event> events = diceScraper.scrapeEvents();
         eventService.fillEvents();
 
         for (Event event : events) {
-            EventService.fillEventLineup(event.getArtistsString());
+            eventService.fillEventLineup(event.getArtistsString());
         }
-        
-
 
         for (Event event : events) {
             System.out.println(event);
@@ -45,5 +48,5 @@ public class Main {
             System.out.println("***************");
         }
     }
-
 }
+

@@ -1,34 +1,28 @@
 package com.caseybrugna.nyc_events.service;
 
+import com.caseybrugna.nyc_events.service.ArtistService;
+
 import com.caseybrugna.nyc_events.model.Artist;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-//import com.caseybrugna.nyc_events.model.Event;
-
-/**
- * Service class for managing artist data.
- */
+@Service
 public class ArtistService {
     private static final Logger LOGGER = Logger.getLogger(ArtistService.class.getName());
 
-    private static SpotifyAPIClient spotifyApiClient;
-    private List<Artist> artists = new ArrayList<>();
+    private final SpotifyAPIClient spotifyApiClient;
 
-    /**
-     * Constructs an ArtistService object.
-     */
-    public ArtistService() {
-        this.artists = new ArrayList<>();
+    public ArtistService(SpotifyAPIClient spotifyApiClient) {
+        this.spotifyApiClient = spotifyApiClient;
     }
 
-    public static void fillArtist(Artist artist) {
-        spotifyApiClient = new SpotifyAPIClient();
+    public void fillArtist(Artist artist) {
         String artistName = artist.getArtistName();
         String artistID = spotifyApiClient.getArtistID(artistName);
 
@@ -38,26 +32,26 @@ public class ArtistService {
             String artistUrl = spotifyApiClient.getArtistSpotifyUrl(artistID);
             String[] artistGenres = spotifyApiClient.getArtistGenres(artistID);
 
+            artist.setArtistID(artistID);
             artist.setArtistTrackMap(artistTrackMap);
             artist.setArtistPopularityScore(artistPopularityScore);
             artist.setArtistUrl(artistUrl);
-            artist.setArtistGenres(artistGenres);
+            artist.setArtistGenres(Arrays.asList(artistGenres));
         } else {
             String searchUrl = getArtistSearchUrl(artistName);
             artist.setArtistUrl(searchUrl);
         }
     }
 
-    private static String getArtistSearchUrl(String artistName) {
+    private String getArtistSearchUrl(String artistName) {
         String baseUrl = "https://www.google.com/search?q=";
-        String encodedSearchText = "";
+        String encodedSearchText;
         try {
-            encodedSearchText = URLEncoder.encode(artistName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.INFO, "Error encoding artist name: " + artistName, e);
+            encodedSearchText = java.net.URLEncoder.encode(artistName, "UTF-8");
+        } catch (java.io.UnsupportedEncodingException e) {
+            LOGGER.log(Level.SEVERE, "Error encoding artist name: " + artistName, e);
             return null;
         }
         return baseUrl + encodedSearchText;
-    } 
-
+    }
 }

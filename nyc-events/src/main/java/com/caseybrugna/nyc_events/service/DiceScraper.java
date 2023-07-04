@@ -22,10 +22,13 @@ import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Service;
+
 /**
  * A class that provides methods to scrape event data from a website and store
  * it in Event objects.
  */
+@Service
 public class DiceScraper {
     private static final Logger LOGGER = Logger.getLogger(DiceScraper.class.getName());
 
@@ -37,7 +40,7 @@ public class DiceScraper {
      * @return A list of Event objects, each representing an event extracted from the website.
      * @throws RuntimeException If there's an error during website data retrieval or event detail extraction.
      */
-    public static List<Event> scrapeEvents() {
+    public List<Event> scrapeEvents() {
         String url = "https://dice.fm/browse/new-york/music/dj";
         WebDriver driver = setupWebDriver();
         driver.get(url);
@@ -53,11 +56,9 @@ public class DiceScraper {
      *
      * @return An instance of WebDriver.
      */
-    private static WebDriver setupWebDriver() {
+    private WebDriver setupWebDriver() {
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver();
         return driver;
     }
 
@@ -66,9 +67,9 @@ public class DiceScraper {
      *
      * @param driver The WebDriver instance used for web scraping operations.
      */
-    private static void dismissCookieConsentPopup(WebDriver driver) {
+    private void dismissCookieConsentPopup(WebDriver driver) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, 10);
             WebElement allowCookiesButton = wait.until(ExpectedConditions
                     .elementToBeClickable(By.cssSelector(".ch2-btn.ch2-allow-all-btn.ch2-btn-primary")));
             allowCookiesButton.click();
@@ -82,10 +83,10 @@ public class DiceScraper {
      *
      * @param driver The WebDriver instance used for web scraping operations.
      */
-    private static void loadAllEvents(WebDriver driver) {
+    private void loadAllEvents(WebDriver driver) {
         try {
             while (true) {
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                WebDriverWait wait = new WebDriverWait(driver, 10);
                 WebElement loadMoreDiv = driver
                         .findElement(By.cssSelector("div.styles__LoadMoreRow-sc-1505uh6-1.cxEHUh"));
                 WebElement loadMoreButton = loadMoreDiv
@@ -109,7 +110,7 @@ public class DiceScraper {
      * @param driver The WebDriver instance used for web scraping operations.
      * @return A list of Event objects, each representing an event extracted from the website.
      */
-    private static List<Event> extractEventDetails(WebDriver driver) {
+    private List<Event> extractEventDetails(WebDriver driver) {
         List<Event> events = new ArrayList<>();
         List<WebElement> eventElements = driver.findElements(By.cssSelector("div.EventCard__Event-sc-95ckmb-1"));
         for (WebElement eventElement : eventElements) {
@@ -131,7 +132,7 @@ public class DiceScraper {
      * @param eventElement The WebElement from which to extract event details.
      * @return An Event object with the details extracted from the provided WebElement.
      */
-    private static Event extractEvent(WebElement eventElement) {
+    private Event extractEvent(WebElement eventElement) {
         try {
             String eventName = extractText(eventElement, "div.styles__Title-mwubo3-6");
             String date = extractText(eventElement, "div.styles__Date-mwubo3-8");
@@ -157,7 +158,7 @@ public class DiceScraper {
      * @param cssSelector The CSS selector to locate the target element within the provided WebElement.
      * @return The extracted text as a String, or an empty string if the target element is not found.
      */
-    private static String extractText(WebElement element, String cssSelector) {
+    private String extractText(WebElement element, String cssSelector) {
         WebElement targetElement = element.findElement(By.cssSelector(cssSelector));
         return targetElement != null ? targetElement.getText() : "";
     }
@@ -169,7 +170,7 @@ public class DiceScraper {
      * @param eventLink The URL of the event page from which to extract the artist lineup.
      * @return A String representing the artist lineup, or null if no lineup is found or an error occurs during extraction.
      */
-    private static String extractArtistsString(String eventLink) {
+    private String extractArtistsString(String eventLink) {
         try {
             Document eventDocument = Jsoup.connect(eventLink).get();
             Element artistElement = eventDocument.selectFirst("div.EventDetailsLineup__ArtistTitle-gmffoe-10");
