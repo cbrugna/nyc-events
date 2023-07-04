@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class EventService {
     private static final Logger LOGGER = Logger.getLogger(EventService.class.getName());
 
-    private final List<Event> events;
+    private List<Event> events;
 
     private final ArtistService artistService;
 
@@ -30,6 +30,7 @@ public class EventService {
     }
 
     public void fillEvents() {
+        System.out.println("FILL EVENTS INVOKED ASDASDAKSDFJ AKJFKLAJSKLDF");
         for (Event event : events) {
             event.setDate(formatDate(event.getDateString()));
             event.setLineup(fillEventLineup(event.getArtistsString()));
@@ -81,5 +82,9 @@ public class EventService {
         }
 
         return lineup;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }

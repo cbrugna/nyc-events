@@ -29,9 +29,10 @@ public class Main {
         ApplicationContext context = SpringApplication.run(Main.class, args);
 
         DiceScraper diceScraper = context.getBean(DiceScraper.class);
-        EventService eventService = context.getBean(EventService.class);
-
         List<Event> events = diceScraper.scrapeEvents();
+        SpotifyAPIClient spotifyApiClient = context.getBean(SpotifyAPIClient.class);
+        ArtistService artistService = new ArtistService(spotifyApiClient);
+        EventService eventService = new EventService(events, artistService);
         eventService.fillEvents();
 
         for (Event event : events) {

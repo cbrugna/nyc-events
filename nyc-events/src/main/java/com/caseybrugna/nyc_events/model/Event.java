@@ -24,8 +24,11 @@ public class Event {
     private String artistsString;
 
     private java.sql.Date date;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "event_id")
+    
+    @ManyToMany
+    @JoinTable(name = "event_artist",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id"))
     private List<Artist> lineup;
     
 

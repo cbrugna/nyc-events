@@ -13,6 +13,7 @@ import javax.persistence.*;
 @Entity
 public class Artist {
     @Id
+    @Column(name = "artist_id")
     private String artistID;
     private String artistName;
 
@@ -23,6 +24,10 @@ public class Artist {
 
     @ElementCollection
     private List<String> artistGenres;
+
+    @ManyToMany(mappedBy = "lineup")
+    private List<Event> events;
+
 
     /**
      * Constructs an Artist object with the specified details.
