@@ -1,14 +1,21 @@
 package com.caseybrugna.nyc_events;
 
 import java.util.List;
+
+import javax.persistence.Entity;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.caseybrugna.nyc_events.model.Artist;
 import com.caseybrugna.nyc_events.model.Event;
+import com.caseybrugna.nyc_events.repository.ArtistRepository;
+import com.caseybrugna.nyc_events.repository.EventRepository;
 import com.caseybrugna.nyc_events.service.DiceScraper;
 import com.caseybrugna.nyc_events.service.EventService;
 import com.caseybrugna.nyc_events.service.SpotifyAPIClient;
@@ -20,6 +27,8 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = {"com.caseybrugna.nyc_events", "com.caseybrugna.nyc_events.config"})
+//@EnableJpaRepositories
+@EntityScan("com.caseybrugna.nyc_events.model")
 public class Main {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.configure()
@@ -28,11 +37,14 @@ public class Main {
 
         ApplicationContext context = SpringApplication.run(Main.class, args);
 
+        EventRepository eventRepository = context.getBean(EventRepository.class);
+        ArtistRepository artistRepository = context.getBean(ArtistRepository.class);
+
         DiceScraper diceScraper = context.getBean(DiceScraper.class);
         List<Event> events = diceScraper.scrapeEvents();
         SpotifyAPIClient spotifyApiClient = context.getBean(SpotifyAPIClient.class);
-        ArtistService artistService = new ArtistService(spotifyApiClient);
-        EventService eventService = new EventService(events, artistService);
+        ArtistService artistService = new ArtistService(spotifyApiClient, artistRepository);
+        EventService eventService = new EventService(events, artistService, eventRepository);
         eventService.fillEvents();
 
         for (Event event : events) {

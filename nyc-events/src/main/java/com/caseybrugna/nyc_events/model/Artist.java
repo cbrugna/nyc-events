@@ -28,6 +28,10 @@ public class Artist {
     @ManyToMany(mappedBy = "lineup")
     private List<Event> events;
 
+    public Artist() {
+        // Default constructor for hibernate
+    }
+
 
     /**
      * Constructs an Artist object with the specified details.

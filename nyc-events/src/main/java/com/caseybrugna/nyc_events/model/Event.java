@@ -31,6 +31,9 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "artist_id"))
     private List<Artist> lineup;
     
+    public Event() {
+        // Default constructor for hibernate
+    }
 
     /**
      * Constructs an Event object with the specified details.

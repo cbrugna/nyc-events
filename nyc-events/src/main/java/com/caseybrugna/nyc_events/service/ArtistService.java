@@ -3,6 +3,8 @@ package com.caseybrugna.nyc_events.service;
 import com.caseybrugna.nyc_events.service.ArtistService;
 
 import com.caseybrugna.nyc_events.model.Artist;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -12,14 +14,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.caseybrugna.nyc_events.repository.ArtistRepository;
+
 @Service
 public class ArtistService {
     private static final Logger LOGGER = Logger.getLogger(ArtistService.class.getName());
 
     private final SpotifyAPIClient spotifyApiClient;
+    private final ArtistRepository artistRepository;
 
-    public ArtistService(SpotifyAPIClient spotifyApiClient) {
+    @Autowired
+    public ArtistService(SpotifyAPIClient spotifyApiClient, ArtistRepository artistRepository) {
         this.spotifyApiClient = spotifyApiClient;
+        this.artistRepository = artistRepository;
     }
 
     public void fillArtist(Artist artist) {
@@ -41,6 +48,8 @@ public class ArtistService {
             String searchUrl = getArtistSearchUrl(artistName);
             artist.setArtistUrl(searchUrl);
         }
+
+        artistRepository.save(artist);
     }
 
     private String getArtistSearchUrl(String artistName) {

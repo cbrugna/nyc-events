@@ -15,18 +15,22 @@ import com.caseybrugna.nyc_events.model.Artist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.caseybrugna.nyc_events.repository.EventRepository;
+
 @Service
 public class EventService {
     private static final Logger LOGGER = Logger.getLogger(EventService.class.getName());
 
     private List<Event> events;
-
     private final ArtistService artistService;
+    private final EventRepository eventRepository;
 
     @Autowired
-    public EventService(List<Event> events, ArtistService artistService) {
+    public EventService(List<Event> events, ArtistService artistService, EventRepository eventRepository) {
         this.events = events;
         this.artistService = artistService;
+        this.eventRepository = eventRepository;
+        
     }
 
     public void fillEvents() {
@@ -35,6 +39,9 @@ public class EventService {
             event.setDate(formatDate(event.getDateString()));
             event.setLineup(fillEventLineup(event.getArtistsString()));
             event.setEventID(generateEventID(event.getEventName(), event.getDate(), event.getLocation()));
+
+            // Save event to the database
+            eventRepository.save(event);
         }
     }
 

@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.jvnet.hk2.annotations.Service;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 /**
  * A class to interact with the Spotify API and retrieve artist and track data.
  */
+@Service
 public class SpotifyAPIClient {
     private static final String CLIENT_ID;
     private static final String CLIENT_SECRET;
