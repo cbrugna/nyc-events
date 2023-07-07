@@ -22,6 +22,8 @@ import com.caseybrugna.nyc_events.service.SpotifyAPIClient;
 import com.caseybrugna.nyc_events.service.ArtistService;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * The main class that coordinates the scraping of events and artist data.
  */
@@ -30,10 +32,16 @@ import io.github.cdimascio.dotenv.Dotenv;
 //@EnableJpaRepositories
 @EntityScan("com.caseybrugna.nyc_events.model")
 public class Main {
+
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.configure()
             .directory("src/main/resources")
             .load();
+
+        
+        log.info("This is an INFO");
+        log.warn("This is a WARN");
 
         ApplicationContext context = SpringApplication.run(Main.class, args);
 
@@ -48,7 +56,7 @@ public class Main {
         eventService.fillEvents();
 
         for (Event event : events) {
-            eventService.fillEventLineup(event.getArtistsString());
+            eventService.fillEventLineup(event.getArtistsString(), event);
         }
 
         for (Event event : events) {

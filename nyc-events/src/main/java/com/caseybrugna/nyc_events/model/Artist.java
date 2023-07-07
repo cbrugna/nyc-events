@@ -11,18 +11,27 @@ import javax.persistence.*;
  * Represents an artist with their details.
  */
 @Entity
+@Table(name = "artist")
 public class Artist {
     @Id
     @Column(name = "artist_id")
     private String artistID;
+
     private String artistName;
 
     @ElementCollection
+    @CollectionTable(name = "artist_track_map", joinColumns = @JoinColumn(name = "artist_id"))
+    @MapKeyColumn(name = "track_title")
+    @Column(name = "track_id")
     private Map<String, String> artistTrackMap;
+
     private int artistPopularityScore;
+
     private String artistUrl;
 
     @ElementCollection
+    @CollectionTable(name = "artist_genres", joinColumns = @JoinColumn(name = "artist_id"))
+    @Column(name = "genre")
     private List<String> artistGenres;
 
     @ManyToMany(mappedBy = "lineup")
@@ -30,6 +39,9 @@ public class Artist {
 
     public Artist() {
         // Default constructor for hibernate
+        this.artistTrackMap = new HashMap<>();
+        this.artistGenres = new ArrayList<>();
+        this.events = new ArrayList<>();
     }
 
 
@@ -46,6 +58,7 @@ public class Artist {
         this.artistPopularityScore = -1;
         this.artistUrl = "";
         this.artistGenres = new ArrayList<>();
+        this.events = new ArrayList<>();
     }
 
     public String getArtistID() {
@@ -96,12 +109,16 @@ public class Artist {
         this.artistGenres = artistGenres;
     }
 
+   public void addEvent(Event event) {
+        this.events.add(event);
+   }
     @Override
     public String toString() {
         return "Artist ID: " + artistID + "\n"
                 + "Artist Name: " + artistName + "\n"
                 + "Popularity Score: " + artistPopularityScore + "\n"
                 + "External URLs: " + artistUrl + "\n"
-                + "Artist Genres: " + artistGenres.size();
+                + "Artist Genres: " + artistGenres.size() + "\n"
+                + "Events: " + events.size();
     }
 }

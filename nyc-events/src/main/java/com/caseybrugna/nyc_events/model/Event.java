@@ -10,6 +10,7 @@ import javax.persistence.*;
  */
 
 @Entity
+@Table(name = "event")
 public class Event {
     @Id
     @Column(name = "event_id")
@@ -33,6 +34,7 @@ public class Event {
     
     public Event() {
         // Default constructor for hibernate
+        this.lineup = new ArrayList<>();
     }
 
     /**

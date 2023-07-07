@@ -37,7 +37,7 @@ public class EventService {
         System.out.println("FILL EVENTS INVOKED ASDASDAKSDFJ AKJFKLAJSKLDF");
         for (Event event : events) {
             event.setDate(formatDate(event.getDateString()));
-            event.setLineup(fillEventLineup(event.getArtistsString()));
+            event.setLineup(fillEventLineup(event.getArtistsString(), event));
             event.setEventID(generateEventID(event.getEventName(), event.getDate(), event.getLocation()));
 
             // Save event to the database
@@ -64,7 +64,7 @@ public class EventService {
         return Integer.toHexString(eventDetails.hashCode()).replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public List<Artist> fillEventLineup(String artistsString) {
+    public List<Artist> fillEventLineup(String artistsString, Event event) {
         List<Artist> lineup = new ArrayList<>();
         if (artistsString == null || artistsString.isEmpty()) {
             return lineup;
@@ -85,7 +85,7 @@ public class EventService {
         }
 
         for (Artist artistToBeFilled : lineup) {
-            artistService.fillArtist(artistToBeFilled);
+            artistService.fillArtist(artistToBeFilled, event);
         }
 
         return lineup;

@@ -3,6 +3,7 @@ package com.caseybrugna.nyc_events.service;
 import com.caseybrugna.nyc_events.service.ArtistService;
 
 import com.caseybrugna.nyc_events.model.Artist;
+import com.caseybrugna.nyc_events.model.Event;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,9 +30,10 @@ public class ArtistService {
         this.artistRepository = artistRepository;
     }
 
-    public void fillArtist(Artist artist) {
+    public void fillArtist(Artist artist, Event event) {
         String artistName = artist.getArtistName();
         String artistID = spotifyApiClient.getArtistID(artistName);
+        artist.addEvent(event);
 
         if (artistID != null) {
             Map<String, String> artistTrackMap = spotifyApiClient.getTrackMap(artistID);
